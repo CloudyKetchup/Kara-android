@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="120dp"
-    android:background="#c64849"
-    android:gravity="bottom"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:background="#242633"
+        android:gravity="bottom">
 
-    <ImageView
-            android:layout_width="422dp"
-            android:layout_height="wrap_content"
-            android:background="@mipmap/menu_background"/>
+        <ImageView
+                android:layout_width="422dp"
+                android:layout_height="wrap_content"
+                android:background="@mipmap/menu_background"/>
 </LinearLayout>

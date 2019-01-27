@@ -1,4 +1,4 @@
-package com.krypt0n.kara
+package com.krypt0n.kara.UI
 
 class ListItem (head : String,description : String){
     var head : String = head
