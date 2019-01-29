@@ -1,50 +1,61 @@
 package com.krypt0n.kara
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.BottomNavigationView.OnNavigationItemSelectedListener
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.RecyclerView
-import com.krypt0n.kara.Logic.Data
-import com.krypt0n.kara.Logic.Note
-import com.krypt0n.kara.UI.ListItem
-import com.krypt0n.kara.UI.MyAdapter
-import com.krypt0n.kara.UI.NotesView
-import java.io.FileInputStream
-import java.io.ObjectInputStream
+import android.util.Log
+import com.krypt0n.kara.Cloud.Account
+import com.krypt0n.kara.Cloud.MongoDatabase
+import com.krypt0n.kara.UI.NotesFragment
+import com.krypt0n.kara.UI.TrashFragment
+import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
+import org.json.JSONArray
+import java.io.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var recycler_view: RecyclerView
-    private var storage_permission : Int = 1
-    private lateinit var d : Data
+    private lateinit var database : MongoDatabase
+    private lateinit var account : Account
+
+    var notes = ArrayList<Note>()
+    var trash = ArrayList<Note>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        var navigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
+        val navigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+
         navigationView.setOnNavigationItemSelectedListener(navListener)
 
-        d = Data()
 
-        loadFile("notes",d.notes)
-
-        recycler_view.adapter = MyAdapter(d.notes_list,this)
-//        openFragment(NotesView(R.layout.notes_fragment))
+//        if (internetAvailable(this)){
+//            database = MongoDatabase().apply {
+//                mongo_connected = true
+//            }
+//        }
+//        loadAccount()
+        loadFile("notes")
+        openFragment(NotesFragment(notes))
     }
 
     private var navListener = OnNavigationItemSelectedListener { item ->
-        lateinit var selected_fragment : NotesView
+        lateinit var selected_fragment : Fragment
         when (item.itemId) {
             R.id.notes -> {
-                selected_fragment = NotesView(R.layout.notes_fragment)
+                selected_fragment = NotesFragment(notes)
                 openFragment(selected_fragment)
                 return@OnNavigationItemSelectedListener true
             }
             R.id.trash -> {
-                selected_fragment = NotesView(R.layout.trash_fragment)
+                selected_fragment = TrashFragment()
                 openFragment(selected_fragment)
                 return@OnNavigationItemSelectedListener true
             }
@@ -52,19 +63,35 @@ class MainActivity : AppCompatActivity() {
         false
     }
     private fun openFragment(fragment: Fragment) {
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.fragment_container, fragment)
-        transaction.addToBackStack(null)
-        transaction.commit()
-    }
-    private fun loadFile(file : String, list : ArrayList<Note>){
-        val fis = FileInputStream("$filesDir/$file")
-        val ois = ObjectInputStream(fis)
-        list.equals(ois.read())
-        for (i in d.notes){
-            var l_item = ListItem(i.title,i.text)
-            d.notes_list.add(l_item)
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.fragment_container, fragment)
+            addToBackStack(null)
+            commit()
         }
+    }
+    private fun loadFile(file : String){
+        val f = File("$filesDir/$file")
+        if (f.exists()) {
+            val fis = FileInputStream(f)
+            val ois = ObjectInputStream(fis)
+            ois.use {
+                notes = ois.readObject() as ArrayList<Note>
+            }
+        }
+    }
+//    private fun loadAccount(){
+//        val config = database.config
+//        val user = config.get("user") as JSONObject
+//        val name = user.get("name") as String
+//        val password = user.get("password") as String
+//        database.signIn(name,password)
+//        account = Account(name, password)
+//    }
+    fun internetAvailable(activity: AppCompatActivity): Boolean{
+        val connectivityManager = activity.getSystemService(Context.CONNECTIVITY_SERVICE)
+                as ConnectivityManager
+        val networkInfo = connectivityManager.activeNetworkInfo
+        return networkInfo != null && networkInfo.isConnected
     }
 }
 

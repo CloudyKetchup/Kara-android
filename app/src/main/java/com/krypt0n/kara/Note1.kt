@@ -1,12 +1,10 @@
-package com.krypt0n.kara.Logic
+package com.krypt0n.kara
 
 import java.text.SimpleDateFormat
 import java.util.*
 
-class Note (title : String,text : String){
-    var title= title
-    var text = text
-    var last_modified = toSimpleString(Date())
+class Note1 (var title: String, var text: String){
+    var last_modified = this.toSimpleString(Date())
 
     fun toSimpleString(date: Date?) = with(date ?: Date()) {
         SimpleDateFormat("dd/MM/yyy").format(this)

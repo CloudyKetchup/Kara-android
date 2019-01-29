@@ -10,18 +10,21 @@
                     android:padding="@dimen/fab_margin"
                     android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:background="#242633">
 
                 <TextView
                         android:id="@+id/note_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Title"
+                        android:textColor="#c7dbdc"
                         android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"/>
                 <TextView
                         android:id="@+id/note_desc"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textColor="#c7dbdc"
                         android:text="Description"/>
 
             </LinearLayout>
