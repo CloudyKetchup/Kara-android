@@ -23,7 +23,7 @@ class NewNoteActivity : AppCompatActivity() {
         else{
             //put note object in list
             notes.add(Note(title,text))
-            writeFile("$filesDir")
+            writeFile("$filesDir/notes",notes)
             //finish this activity
             finish()
         }

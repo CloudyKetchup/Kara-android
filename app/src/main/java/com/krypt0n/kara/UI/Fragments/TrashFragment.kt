@@ -1,4 +1,4 @@
-package com.krypt0n.kara.UI
+package com.krypt0n.kara.UI.Fragments
 
 import android.annotation.SuppressLint
 import android.os.Bundle

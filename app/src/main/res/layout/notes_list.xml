@@ -1,33 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content">
-    <android.support.v7.widget.CardView
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#dd3334">
+    <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <LinearLayout
-                    android:padding="@dimen/fab_margin"
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#242633">
-
-                <TextView
-                        android:id="@+id/note_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Title"
-                        android:textColor="#c7dbdc"
-                        android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"/>
-                <TextView
-                        android:id="@+id/note_desc"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="#b0c3c4"
-                        android:text="Description"/>
-
-            </LinearLayout>
-    </android.support.v7.widget.CardView>
-
-</LinearLayout>
+            android:layout_height="80dp"
+            android:background="#dd3334"
+            android:id="@+id/view_background">
+        <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="@dimen/fab_margin"
+                android:src="@drawable/ic_swipe_delete"
+                android:id="@+id/swipe_delete_icon"/>
+    </RelativeLayout>
+    <RelativeLayout
+            android:padding="15dp"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:background="#242633"
+            android:id="@+id/view_foreground">
+        <TextView
+                android:id="@+id/note_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Title"
+                android:textColor="#daeeef"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"/>
+        <TextView
+                android:id="@+id/note_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/note_title"
+                android:textColor="#a0b1b2"
+                android:text="Description"/>
+    </RelativeLayout>
+</FrameLayout>

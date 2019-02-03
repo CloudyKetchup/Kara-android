@@ -11,14 +11,10 @@ import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import com.krypt0n.kara.Cloud.Account
 import com.krypt0n.kara.Cloud.MongoDatabase
-import com.krypt0n.kara.UI.NotesFragment
-import com.krypt0n.kara.UI.TrashFragment
+import com.krypt0n.kara.UI.Fragments.NotesFragment
+import com.krypt0n.kara.UI.Fragments.TrashFragment
 import org.json.JSONObject
-import java.io.File
-import java.io.FileInputStream
-import java.io.ObjectInputStream
-import java.io.PrintStream
-import java.io.Serializable
+import java.io.*
 
 class MainActivity : AppCompatActivity() {
     lateinit var database : MongoDatabase
@@ -37,23 +33,26 @@ class MainActivity : AppCompatActivity() {
 //                mongo_connected = true
 //            }
 //        loadAccount()
-        loadFile("$filesDir/notes")
-        loadFile("$filesDir/trash")
-    }
-    override fun onResume() {
-        openFragment(NotesFragment(notes))
-        super.onResume()
+        loadFile("$filesDir","notes")
+        loadFile("$filesDir","trash")
     }
     //multi dex
     override fun attachBaseContext(base : Context){
         super.attachBaseContext(base)
         MultiDex.install(this)
     }
+    override fun onResume() {
+        openFragment(NotesFragment())
+        super.onResume()
+    }
+    override fun onBackPressed() {
+        finish()
+    }
     private var navListener = OnNavigationItemSelectedListener { item ->
         lateinit var selected_fragment : Fragment
         when (item.itemId) {
             R.id.notes -> {
-                selected_fragment = NotesFragment(notes)
+                selected_fragment = NotesFragment()
                 openFragment(selected_fragment)
                 return@OnNavigationItemSelectedListener true
             }
@@ -68,6 +67,7 @@ class MainActivity : AppCompatActivity() {
         }
         false
     }
+    //open fragment containing note list (notes/trash)
     private fun openFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.fragment_container, fragment)
@@ -76,19 +76,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
     //load notes/trash from file on local storage
-    private fun loadFile(file : String) {
+    private fun loadFile(directory: String,file: String) {
         Thread {
-            val f = File(file)
+            val f = File("$directory/$file")
             if(f.exists()) {
                 try {
-                    val temp = ObjectInputStream(FileInputStream(file)).readObject() as ArrayList<Note>
+                    val temp = ObjectInputStream(FileInputStream(f)).readObject() as ArrayList<Note>
                     if (file.contains("notes")) {
                         notes = temp
-                        openFragment(NotesFragment(notes))
                     } else
                         trash = temp
+                    openFragment(NotesFragment())
                 } catch (e: Exception) {
-                    val f = File("$filesDir/log.txt")
+                    val f = File("$directory/log.txt")
                     val p = PrintStream(f)
                     e.printStackTrace(p)
                 }
