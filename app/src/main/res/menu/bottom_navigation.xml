@@ -6,7 +6,13 @@
     <item android:id = "@+id/trash"
           android:icon="@drawable/ic_trash"
           android:title="Trash"/>
+    <item android:id="@+id/create_note"
+          android:icon="@drawable/ic_add"
+          android:title="New"/>
     <item android:id="@+id/settings"
         android:icon="@drawable/ic_settings_black_24dp"
         android:title="Settings"/>
+    <item android:id="@+id/account"
+          android:icon="@drawable/ic_account"
+          android:title="Account"/>
 </menu>

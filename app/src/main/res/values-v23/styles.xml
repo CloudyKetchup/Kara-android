@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="TitleFieldTheme" parent="AppTheme.NoActionBar">
+        <item name="colorControlNormal">#c7dbdc</item>
+        <item name="colorControlActivated">#c62f30</item>
+        <item name="colorControlHighlight">#c62f30</item>
+        <item name="android:textColorHint">#373a4f</item>
+    </style>
+    <style name="TextFieldTheme" parent="AppTheme.NoActionBar">
+        <item name="colorControlNormal">#242633</item>
+        <item name="colorControlActivated">#242633</item>
+        <item name="colorControlHighlight">#242633</item>
+        <item name="android:textColorHint">#373a4f</item>
+    </style>
+</resources>

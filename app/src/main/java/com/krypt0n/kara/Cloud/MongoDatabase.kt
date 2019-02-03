@@ -1,14 +1,10 @@
 package com.krypt0n.kara.Cloud
 
-import android.support.v7.app.AppCompatActivity
-import com.krypt0n.kara.Cloud.Account
 import com.mongodb.BasicDBObject
 import com.mongodb.DBObject
 import com.mongodb.MongoClient
 import org.json.JSONObject
-import java.io.File
-import java.io.FileReader
-import java.io.FileWriter
+import java.io.*
 
 class MongoDatabase {
     val ip = "196.168.0.14"
@@ -25,23 +21,23 @@ class MongoDatabase {
     val acc_file = File("/acc_config.json")
     var mongo_connected = false
 
-//    init {
-//        if (acc_file.exists())
-//            loadConfig()
-//        else
-//            createConfig()
-//    }
+    init {
+        if (acc_file.exists())
+            loadConfig()
+        else
+            createConfig()
+    }
     fun signIn(name : String,password: String){
         if (mongo_connected)
             acc = temp_data.get(name) as BasicDBObject
         else
-//            acc = config.get(name) as BasicDBObject
+            acc = config.get(name) as BasicDBObject
         if (acc != null) {
             val acc_name = acc.get("name") as String
             val acc_pass = acc.get("password") as String
             if (acc_pass == password){
                 local_acc = Account(acc_name, acc_pass)
-//                updateConfig(acc_name,acc_pass)
+                updateConfig(acc_name,acc_pass)
             }else{
                 //wrong password banner
             }
@@ -71,25 +67,25 @@ class MongoDatabase {
             return true
         return false
     }
-//    fun createConfig() {
-//        config = JSONObject()
-//        config.put("user",JSONObject())
-//        writeConfig(config)
-//    }
-//    fun loadConfig() {
-//        val parser = JSONParser()
-//        config = parser.parse(FileReader(acc_file)) as JSONObject
-//    }
-//    fun writeConfig(config : JSONObject){
-//        val fw  = FileWriter(acc_file)
-//        fw.write(config.toJSONString())
-//        fw.flush()
-//    }
-//    fun updateConfig(name : String,password : String){
-//        val updated_config = config
-//        val user = updated_config.get("user") as JSONObject
-//        user.put("name",name)
-//        user.put("password",password)
-//        writeConfig(updated_config)
-//    }
+    fun createConfig() {
+        config = JSONObject()
+        config.put("user",JSONObject())
+        writeConfig(config)
+    }
+    fun loadConfig() {
+        val fr = FileReader(acc_file)
+        config = fr.read() as JSONObject
+    }
+    fun writeConfig(config : JSONObject){
+        val fw  = FileWriter(acc_file)
+        fw.write(config.toString())
+        fw.flush()
+    }
+    fun updateConfig(name : String,password : String){
+        val updated_config = config
+        val user = updated_config.get("user") as JSONObject
+        user.put("name",name)
+        user.put("password",password)
+        writeConfig(updated_config)
+    }
 }

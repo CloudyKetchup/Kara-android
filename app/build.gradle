@@ -13,6 +13,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -23,7 +24,7 @@ android {
 }
 
 dependencies {
-    implementation 'io.reactivex.rxjava2:rxkotlin:2.3.0'
+    implementation 'com.android.support:multidex:1.0.0'
     implementation "org.mongodb:mongo-java-driver:3.9.1"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

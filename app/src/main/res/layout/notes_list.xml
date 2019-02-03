@@ -24,7 +24,7 @@
                         android:id="@+id/note_desc"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="#c7dbdc"
+                        android:textColor="#b0c3c4"
                         android:text="Description"/>
 
             </LinearLayout>

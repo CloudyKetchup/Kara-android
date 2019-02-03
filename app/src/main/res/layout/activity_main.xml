@@ -18,7 +18,7 @@
                 android:id="@+id/bottom_navigation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#ed1c3f"
+                android:background="#dd3334"
                 android:layout_alignParentBottom="true"
                 app:menu="@menu/bottom_navigation"/>
 </RelativeLayout>

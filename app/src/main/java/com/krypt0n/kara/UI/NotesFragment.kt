@@ -3,6 +3,7 @@ package com.krypt0n.kara.UI
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -15,7 +16,6 @@ import kotlin.collections.ArrayList
 class NotesFragment() : Fragment() {
     lateinit var notes_list : ArrayList<Note>
     lateinit var recyclerView: RecyclerView
-
     @SuppressLint("ValidFragment")
     constructor(list : ArrayList<Note>) : this() {
         notes_list = list
@@ -26,6 +26,7 @@ class NotesFragment() : Fragment() {
         recyclerView = v.findViewById(R.id.notes_recycler_view) as RecyclerView
         val recyclerViewAdapter = RecyclerViewAdapter(context,notes_list)
         recyclerView.layoutManager = LinearLayoutManager(activity)
+        recyclerView.addItemDecoration(DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL))
         recyclerView.adapter = recyclerViewAdapter
         return v
     }
