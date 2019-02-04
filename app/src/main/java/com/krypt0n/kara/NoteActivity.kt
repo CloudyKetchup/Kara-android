@@ -3,6 +3,10 @@ package com.krypt0n.kara
 import android.os.Bundle
 import android.support.design.widget.TextInputEditText
 import android.support.v7.app.AppCompatActivity
+import com.krypt0n.kara.Repository.Note
+import com.krypt0n.kara.Repository.notes
+import com.krypt0n.kara.Repository.selected_item
+import com.krypt0n.kara.Repository.writeFile
 
 class NoteActivity : AppCompatActivity() {
     private lateinit var note : Note
@@ -26,9 +30,9 @@ class NoteActivity : AppCompatActivity() {
         updateNotes()
         super.onStop()
     }
-    private fun updateNotes(){
+    private fun updateNotes() {
         note.title = title_field.text.toString().trim()
         note.text = text_field.text.toString().trim()
-        writeFile("$filesDir/notes",notes)
+        writeFile("$filesDir/notes", notes)
     }
 }

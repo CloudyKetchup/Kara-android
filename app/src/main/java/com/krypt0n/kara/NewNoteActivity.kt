@@ -4,6 +4,9 @@ import android.os.Bundle
 import android.support.design.widget.TextInputEditText
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import com.krypt0n.kara.Repository.Note
+import com.krypt0n.kara.Repository.notes
+import com.krypt0n.kara.Repository.writeFile
 
 class NewNoteActivity : AppCompatActivity() {
     private lateinit var title_field : TextInputEditText
@@ -22,9 +25,9 @@ class NewNoteActivity : AppCompatActivity() {
             title_field.error = "Field cannot be empty"
         else{
             //put note object in list
-            notes.add(Note(title,text))
-            writeFile("$filesDir/notes",notes)
+            notes.add(Note(title, text))
             //finish this activity
+            OnNavigationItemSelectedListener@
             finish()
         }
     }

@@ -1,18 +1,17 @@
-package com.krypt0n.kara.UI
+package com.krypt0n.kara.UI.Adapters
 
-import android.content.Context
 import android.content.Intent
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.krypt0n.kara.*
-import java.io.File
-import java.io.FileInputStream
-import java.io.ObjectInputStream
+import com.krypt0n.kara.Repository.Note
+import com.krypt0n.kara.Repository.notes
+import com.krypt0n.kara.Repository.selected_item
+import com.krypt0n.kara.Repository.trash
 import java.util.regex.Pattern
 
 class RecyclerViewAdapter(val list: ArrayList<Note>) : RecyclerView.Adapter<RecyclerViewAdapter.CustomViewHolder>() {
@@ -37,18 +36,22 @@ class RecyclerViewAdapter(val list: ArrayList<Note>) : RecyclerView.Adapter<Recy
         return CustomViewHolder(v)
     }
     fun removeItem(position: Int){
+        trash.removeAt(position)
+        notifyItemRemoved(position)
+    }
+    fun moveToTrash(position: Int){
+        trash.add(list[position])
         list.removeAt(position)
         notifyItemRemoved(position)
     }
-    fun restoreItem(note: Note,position: Int){
+    fun restoreItem(note: Note, position: Int){
         list.add(position,note)
         notifyItemInserted(position)
     }
     class CustomViewHolder(view : View) : RecyclerView.ViewHolder(view){
-        val title_field = view.findViewById(R.id.note_title) as TextView
-        val desc   = view.findViewById(R.id.note_desc) as TextView
-        val view_foreground = view.findViewById(R.id.view_foreground) as RelativeLayout
-        val view_background= view.findViewById(R.id.view_background) as RelativeLayout
+        val title_field= view.findViewById(R.id.note_title) as TextView
+        val desc= view.findViewById(R.id.note_desc) as TextView
+        val view_foreground= view.findViewById(R.id.view_foreground) as RelativeLayout
         init {
             view.setOnClickListener {
                 selected_item = adapterPosition

@@ -4,17 +4,20 @@ import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.os.Bundle
-import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.BottomNavigationView.OnNavigationItemSelectedListener
 import android.support.multidex.MultiDex
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
+import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
 import com.krypt0n.kara.Cloud.Account
 import com.krypt0n.kara.Cloud.MongoDatabase
+import com.krypt0n.kara.Repository.loadFile
+import com.krypt0n.kara.Repository.notes
+import com.krypt0n.kara.Repository.trash
+import com.krypt0n.kara.Repository.writeFile
 import com.krypt0n.kara.UI.Fragments.NotesFragment
 import com.krypt0n.kara.UI.Fragments.TrashFragment
 import org.json.JSONObject
-import java.io.*
 
 class MainActivity : AppCompatActivity() {
     lateinit var database : MongoDatabase
@@ -24,10 +27,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         //bottom navigation
-        val navigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        val navigationView = findViewById<BottomNavigationViewEx>(R.id.bottom_navigation).apply {
+            enableShiftingMode(false)
+        }
         //bottom navigation action listener
-        navigationView.setOnNavigationItemSelectedListener(navListener)
-
+        navigationView.onNavigationItemSelectedListener = navListener
 //        if (internetAvailable())
 //            database = MongoDatabase().apply {
 //                mongo_connected = true
@@ -35,6 +39,7 @@ class MainActivity : AppCompatActivity() {
 //        loadAccount()
         loadFile("$filesDir","notes")
         loadFile("$filesDir","trash")
+        openFragment(NotesFragment())
     }
     //multi dex
     override fun attachBaseContext(base : Context){
@@ -42,11 +47,17 @@ class MainActivity : AppCompatActivity() {
         MultiDex.install(this)
     }
     override fun onResume() {
-        openFragment(NotesFragment())
+        OnNavigationItemSelectedListener@
+
         super.onResume()
     }
     override fun onBackPressed() {
         finish()
+    }
+    override fun onStop() {
+        writeFile("$filesDir/notes", notes)
+        writeFile("$filesDir/trash", trash)
+        super.onStop()
     }
     private var navListener = OnNavigationItemSelectedListener { item ->
         lateinit var selected_fragment : Fragment
@@ -57,12 +68,18 @@ class MainActivity : AppCompatActivity() {
                 return@OnNavigationItemSelectedListener true
             }
             R.id.trash -> {
-                selected_fragment = TrashFragment(trash)
+                selected_fragment = TrashFragment()
                 openFragment(selected_fragment)
                 return@OnNavigationItemSelectedListener true
             }
             R.id.create_note -> {
                 startActivity(Intent(this, NewNoteActivity()::class.java))
+            }
+            R.id.settings -> {
+                return@OnNavigationItemSelectedListener true
+            }
+            R.id.account -> {
+                return@OnNavigationItemSelectedListener true
             }
         }
         false
@@ -75,28 +92,11 @@ class MainActivity : AppCompatActivity() {
             commit()
         }
     }
-    //load notes/trash from file on local storage
-    private fun loadFile(directory: String,file: String) {
-        Thread {
-            val f = File("$directory/$file")
-            if(f.exists()) {
-                try {
-                    val temp = ObjectInputStream(FileInputStream(f)).readObject() as ArrayList<Note>
-                    if (file.contains("notes")) {
-                        notes = temp
-                    } else
-                        trash = temp
-                    openFragment(NotesFragment())
-                } catch (e: Exception) {
-                    val f = File("$directory/log.txt")
-                    val p = PrintStream(f)
-                    e.printStackTrace(p)
-                }
-            }
-        }.start()
-    }
+    //use account config from device if exist
     private fun loadAccount() {
+        //assign config from database if not null
         val config = database.config
+        //and get all data required
         val user = config.get("user") as JSONObject
         val name = user.get("name") as String
         val password = user.get("password") as String
@@ -111,4 +111,3 @@ class MainActivity : AppCompatActivity() {
         return networkInfo != null && networkInfo.isConnected
     }
 }
-class Note (var title: String, var text: String) : Serializable
