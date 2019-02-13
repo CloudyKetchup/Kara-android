@@ -45,16 +45,14 @@ class MongoDatabase {
     }
     fun signUp(login : String,password: String){
         if (nameExist(temp_data, login)){
-            user = BasicDBObject()
-                .append("name",login)
-                .append("password",password)
-            initial_user = BasicDBObject(login,BasicDBObject()
-                .append("name",login)
-                .append("password",password))
             if (temp_data == null)
-                users.insert(initial_user)
+                users.insert(BasicDBObject(login,BasicDBObject()
+                    .append("name",login)
+                    .append("password",password)))
             else{
-                temp_data.put(login,user)
+                temp_data.put(login, BasicDBObject()
+                    .append("name",login)
+                    .append("password",password))
                 users.update(BasicDBObject(),temp_data)
             }
             temp_data = users.findOne()

@@ -8,6 +8,7 @@ import android.support.design.widget.BottomNavigationView.OnNavigationItemSelect
 import android.support.multidex.MultiDex
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
 import com.krypt0n.kara.Cloud.Account
 import com.krypt0n.kara.Cloud.MongoDatabase

@@ -10,6 +10,7 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import com.krypt0n.kara.R
 import com.krypt0n.kara.Repository.notes
 import com.krypt0n.kara.Repository.trash

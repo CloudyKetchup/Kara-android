@@ -52,25 +52,17 @@ class RecyclerViewAdapter(val list: ArrayList<Note>,val fragment : Fragment) : R
         list.add(position,note)
         notifyItemInserted(position)
     }
-    class CustomViewHolder(view : View,fragment: Fragment) : RecyclerView.ViewHolder(view){
+    class CustomViewHolder(val view : View,val fragment: Fragment) : RecyclerView.ViewHolder(view){
         val title_field= view.findViewById(R.id.note_title) as TextView
         val desc= view.findViewById(R.id.note_desc) as TextView
         val view_foreground= view.findViewById(R.id.view_foreground) as RelativeLayout
         init {
-            when (fragment.tag){
-                NotesFragment().tag -> updateIcons(view,
-                    R.drawable.ic_delete_forever,
-                    R.drawable.ic_delete)
-                TrashFragment().tag -> updateIcons(view,
-                    R.drawable.ic_restore,
-                    R.drawable.ic_delete_forever)
-            }
             view.setOnClickListener {
                 selected_item = adapterPosition
                 view.context.startActivity(Intent(view.context, NoteActivity()::class.java))
             }
         }
-        fun updateIcons(view : View,src_left : Int,src_right : Int){
+        fun updateIcons(src_left : Int,src_right : Int){
            view.findViewById<ImageView>(R.id.swipe_delete_forever_icon).setImageResource(src_left)
            view.findViewById<ImageView>(R.id.swipe_delete_icon).setImageResource(src_right)
         }
