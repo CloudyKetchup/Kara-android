@@ -14,10 +14,16 @@
         <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/fab_margin"
+                android:id="@+id/swipe_delete_forever_icon"/>
+        <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="@dimen/fab_margin"
-                android:src="@drawable/ic_swipe_delete"
                 android:id="@+id/swipe_delete_icon"/>
     </RelativeLayout>
     <RelativeLayout

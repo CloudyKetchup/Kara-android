@@ -22,7 +22,7 @@ class NotesFragment : Fragment() {
             container,
             false
         ) as View
-        val adapter = RecyclerViewAdapter(notes)
+        val adapter = RecyclerViewAdapter(notes,this)
         //recyclerview(shown list)
         val recyclerView = v.findViewById(R.id.notes_recycler_view) as RecyclerView
         recyclerView.apply {
@@ -34,7 +34,10 @@ class NotesFragment : Fragment() {
         //swipe to delete for list
         ItemTouchHelper(object : RecyclerTouchHelper(){
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                adapter.moveToTrash(viewHolder.adapterPosition)
+                if (direction == ItemTouchHelper.LEFT)
+                    adapter.moveToTrash(viewHolder.adapterPosition)
+                else if (direction == ItemTouchHelper.RIGHT)
+                    adapter.removeItem(viewHolder.adapterPosition)
             }
         }).attachToRecyclerView(recyclerView)
         return v

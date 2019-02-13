@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
     }
     override fun onResume() {
         OnNavigationItemSelectedListener@
-
+        openFragment(NotesFragment())
         super.onResume()
     }
     override fun onBackPressed() {
@@ -60,16 +60,13 @@ class MainActivity : AppCompatActivity() {
         super.onStop()
     }
     private var navListener = OnNavigationItemSelectedListener { item ->
-        lateinit var selected_fragment : Fragment
         when (item.itemId) {
             R.id.notes -> {
-                selected_fragment = NotesFragment()
-                openFragment(selected_fragment)
+                openFragment(NotesFragment())
                 return@OnNavigationItemSelectedListener true
             }
             R.id.trash -> {
-                selected_fragment = TrashFragment()
-                openFragment(selected_fragment)
+                openFragment(TrashFragment())
                 return@OnNavigationItemSelectedListener true
             }
             R.id.create_note -> {

@@ -34,7 +34,7 @@ open class RecyclerTouchHelper()
         isCurrentlyActive: Boolean
     ) {
         val foregroundView = (viewHolder as RecyclerViewAdapter.CustomViewHolder).view_foreground
-        getDefaultUIUtil().onDraw(c,recyclerView,foregroundView,dX,dY,actionState,isCurrentlyActive)
+        getDefaultUIUtil().onDraw(c,recyclerView,foregroundView,dX / 2,dY / 2,actionState,isCurrentlyActive)
     }
     //item that appear above background
     override fun onChildDrawOver(
@@ -47,6 +47,6 @@ open class RecyclerTouchHelper()
         isCurrentlyActive: Boolean
     ) {
         val foregroundView = (viewHolder as RecyclerViewAdapter.CustomViewHolder).view_foreground
-        getDefaultUIUtil().onDrawOver(c,recyclerView,foregroundView,dX,dY,actionState,isCurrentlyActive)
+        getDefaultUIUtil().onDrawOver(c,recyclerView,foregroundView,dX / 2,dY / 2,actionState,isCurrentlyActive)
     }
 }
