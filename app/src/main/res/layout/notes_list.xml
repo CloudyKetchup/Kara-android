@@ -3,36 +3,33 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#dd3334">
+        android:layout_height="wrap_content">
     <RelativeLayout
             android:padding="15dp"
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:background="#dd3334"
-            android:id="@+id/view_background">
+            android:id="@+id/notes_view_background">
         <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
                 android:layout_marginLeft="@dimen/fab_margin"
-                android:id="@+id/swipe_delete_forever_icon"/>
+                android:id="@+id/swipe_left_icon"/>
         <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="@dimen/fab_margin"
-                android:id="@+id/swipe_delete_icon"/>
+                android:id="@+id/swipe_right_icon"/>
     </RelativeLayout>
     <RelativeLayout
             android:padding="15dp"
-            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:background="#242633"
-            android:id="@+id/view_foreground">
+            android:id="@+id/notes_view_foreground">
         <TextView
                 android:id="@+id/note_title"
                 android:layout_width="wrap_content"

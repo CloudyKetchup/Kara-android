@@ -8,10 +8,9 @@ import android.support.design.widget.BottomNavigationView.OnNavigationItemSelect
 import android.support.multidex.MultiDex
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
 import com.krypt0n.kara.Cloud.Account
-import com.krypt0n.kara.Cloud.MongoDatabase
+import com.krypt0n.kara.Cloud.Database
 import com.krypt0n.kara.Repository.loadFile
 import com.krypt0n.kara.Repository.notes
 import com.krypt0n.kara.Repository.trash
@@ -21,7 +20,7 @@ import com.krypt0n.kara.UI.Fragments.TrashFragment
 import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
-    lateinit var database : MongoDatabase
+    lateinit var database : Database
     lateinit var account : Account
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,13 +42,13 @@ class MainActivity : AppCompatActivity() {
         openFragment(NotesFragment())
     }
     //multi dex
-    override fun attachBaseContext(base : Context){
+    override fun attachBaseContext(base : Context) {
         super.attachBaseContext(base)
         MultiDex.install(this)
     }
     override fun onResume() {
-        OnNavigationItemSelectedListener@
         openFragment(NotesFragment())
+        OnNavigationItemSelectedListener@
         super.onResume()
     }
     override fun onBackPressed() {

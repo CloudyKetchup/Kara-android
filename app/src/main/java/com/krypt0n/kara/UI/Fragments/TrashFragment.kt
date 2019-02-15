@@ -10,23 +10,24 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import com.krypt0n.kara.R
-import com.krypt0n.kara.Repository.notes
+import com.krypt0n.kara.Repository.opened_notes
 import com.krypt0n.kara.Repository.trash
-import com.krypt0n.kara.UI.Adapters.RecyclerViewAdapter
+import com.krypt0n.kara.UI.Adapters.RecyclerAdapter
 import com.krypt0n.kara.UI.Helpers.RecyclerTouchHelper
 
 class TrashFragment : Fragment() {
+    init {
+        opened_notes = false
+    }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val v = inflater.inflate(
-            R.layout.trash_fragment,
+            com.krypt0n.kara.R.layout.trash_fragment,
             container,
             false
         ) as View
-        val adapter = RecyclerViewAdapter(trash,this)
+        val adapter = RecyclerAdapter(trash,this)
         //recyclerview(shown list)
-        val recyclerView = v.findViewById(R.id.trash_recycler_view) as RecyclerView
+        val recyclerView = v.findViewById(com.krypt0n.kara.R.id.trash_recycler_view) as RecyclerView
         recyclerView.apply {
             layoutManager = LinearLayoutManager(activity)
             addItemDecoration(DividerItemDecoration(recyclerView.context, DividerItemDecoration.VERTICAL))
@@ -38,8 +39,8 @@ class TrashFragment : Fragment() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 if (direction == ItemTouchHelper.LEFT)
                     adapter.removeItem(viewHolder.adapterPosition)
-                else
-                    adapter.restoreItem(notes[viewHolder.adapterPosition],viewHolder.adapterPosition)
+                else if (direction == ItemTouchHelper.RIGHT)
+                    adapter.restoreNote(viewHolder.adapterPosition)
             }
         }).attachToRecyclerView(recyclerView)
         return v

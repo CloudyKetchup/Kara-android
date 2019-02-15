@@ -7,23 +7,31 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import com.krypt0n.kara.R
 import com.krypt0n.kara.Repository.notes
-import com.krypt0n.kara.UI.Adapters.RecyclerViewAdapter
+import com.krypt0n.kara.Repository.opened_notes
+import com.krypt0n.kara.Repository.writeFile
+import com.krypt0n.kara.UI.Adapters.RecyclerAdapter
 import com.krypt0n.kara.UI.Helpers.RecyclerTouchHelper
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStreamWriter
 
 class NotesFragment : Fragment() {
+    init {
+        opened_notes = true
+    }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val v = inflater.inflate(
             R.layout.notes_fragment,
             container,
             false
         ) as View
-        val adapter = RecyclerViewAdapter(notes,this)
+        val adapter = RecyclerAdapter(notes,this)
         //recyclerview(shown list)
         val recyclerView = v.findViewById(R.id.notes_recycler_view) as RecyclerView
         recyclerView.apply {
@@ -35,10 +43,10 @@ class NotesFragment : Fragment() {
         //swipe to delete for list
         ItemTouchHelper(object : RecyclerTouchHelper(){
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                if (direction == ItemTouchHelper.LEFT)
-                    adapter.moveToTrash(viewHolder.adapterPosition)
-                else if (direction == ItemTouchHelper.RIGHT)
+                if (direction == ItemTouchHelper.RIGHT)
                     adapter.removeItem(viewHolder.adapterPosition)
+                else if (direction == ItemTouchHelper.LEFT)
+                    adapter.moveToTrash(viewHolder.adapterPosition)
             }
         }).attachToRecyclerView(recyclerView)
         return v
