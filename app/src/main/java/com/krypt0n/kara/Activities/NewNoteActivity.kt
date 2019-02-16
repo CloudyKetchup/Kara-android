@@ -9,20 +9,15 @@ import com.krypt0n.kara.Repository.Note
 import com.krypt0n.kara.Repository.notes
 
 class NewNoteActivity : AppCompatActivity() {
-    private lateinit var title_field : TextInputEditText
-    private lateinit var text_field  : TextInputEditText
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_note)
-        title_field = findViewById(R.id.title_field)
-        text_field  = findViewById(R.id.text_field)
     }
     fun saveNote(v : View){
-        val title = title_field.text.toString().trim()
-        val text  = text_field.text.toString().trim()
+        val title = findViewById<TextInputEditText>(R.id.title_field).text.toString().trim()
+        val text  = findViewById<TextInputEditText>(R.id.text_field).text.toString().trim()
         if (title.isEmpty())
-            title_field.error = "Field cannot be empty"
+            findViewById<TextInputEditText>(R.id.title_field).error = "Field cannot be empty"
         else{
             //put note object in list
             notes.add(Note(title, text))

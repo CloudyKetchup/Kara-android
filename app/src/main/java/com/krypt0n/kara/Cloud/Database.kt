@@ -55,8 +55,8 @@ class Database(files_dir : File) {
         temp_data = users.findOne()
         signIn(login,password)
     }
-    private fun nameExist(db_object : DBObject, field_text : String) : Boolean {
-        val user = db_object.get(field_text) as DBObject
+    fun nameExist(field_text : String) : Boolean {
+        val user = temp_data.get(field_text) as DBObject
         if (user != null)
             return true
         return false
