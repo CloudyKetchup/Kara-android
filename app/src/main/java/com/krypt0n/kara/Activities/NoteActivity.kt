@@ -1,8 +1,9 @@
-package com.krypt0n.kara
+package com.krypt0n.kara.Activities
 
 import android.os.Bundle
 import android.support.design.widget.TextInputEditText
 import android.support.v7.app.AppCompatActivity
+import com.krypt0n.kara.R
 import com.krypt0n.kara.Repository.Note
 import com.krypt0n.kara.Repository.notes
 import com.krypt0n.kara.Repository.selected_item

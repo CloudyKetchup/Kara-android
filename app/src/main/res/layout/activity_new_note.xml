@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#242633"
-        tools:context=".NewNoteActivity"
+        tools:context=".Activities.NewNoteActivity"
         app:errorEnabled="true">
 
         <android.support.design.widget.TextInputLayout

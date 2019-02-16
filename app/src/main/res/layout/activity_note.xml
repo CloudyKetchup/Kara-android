@@ -5,7 +5,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="#242633"
-                tools:context=".NoteActivity"
+                tools:context=".Activities.NoteActivity"
                 app:errorEnabled="true">
 
     <android.support.design.widget.TextInputLayout

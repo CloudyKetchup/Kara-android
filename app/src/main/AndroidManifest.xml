@@ -12,7 +12,7 @@
             android:name="android.support.multidex.MultiDexApplication"
             tools:ignore="GoogleAppIndexingWarning">
             <activity
-                    android:name="com.krypt0n.kara.MainActivity"
+                    android:name="com.krypt0n.kara.Activities.MainActivity"
                     android:label="@string/title_activity_main"
                     android:theme="@style/AppTheme.NoActionBar"
                     android:launchMode="singleTop">
@@ -23,11 +23,11 @@
                 </intent-filter>
             </activity>
             <activity
-                    android:name=".NewNoteActivity"
+                    android:name=".Activities.NewNoteActivity"
                     android:theme="@style/AppTheme.NoActionBar">
             </activity>
             <activity
-                    android:name=".NoteActivity"
+                    android:name=".Activities.NoteActivity"
                     android:theme="@style/AppTheme.NoActionBar">
             </activity>
     </application>

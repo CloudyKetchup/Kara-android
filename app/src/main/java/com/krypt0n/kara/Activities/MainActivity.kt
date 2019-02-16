@@ -1,4 +1,4 @@
-package com.krypt0n.kara
+package com.krypt0n.kara.Activities
 
 import android.content.Context
 import android.content.Intent
@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
 import com.krypt0n.kara.Cloud.Account
 import com.krypt0n.kara.Cloud.Database
+import com.krypt0n.kara.R
 import com.krypt0n.kara.Repository.loadFile
 import com.krypt0n.kara.Repository.notes
 import com.krypt0n.kara.Repository.trash
@@ -33,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         //bottom navigation action listener
         navigationView.onNavigationItemSelectedListener = navListener
 //        if (internetAvailable())
-//            database = MongoDatabase().apply {
+//            database = Database(filesDir).apply {
 //                mongo_connected = true
 //            }
 //        loadAccount()
