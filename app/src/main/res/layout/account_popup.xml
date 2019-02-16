@@ -6,8 +6,7 @@
         android:layout_height="500dp"
         android:background="@color/Background"
         android:padding="10dp"
-        android:layout_gravity="center"
-        tools:context=".Activities.MainActivity">
+        android:layout_gravity="center">
     <TextView
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -18,12 +17,11 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
             android:layout_marginEnd="5dp"
-
-            android:id="@+id/close"/>
+            android:id="@+id/close_popup"/>
     <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/close">
+            android:layout_below="@+id/close_popup">
         <ImageView
                 android:layout_width="150dp"
                 android:layout_height="150dp"
@@ -49,7 +47,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginTop="220dp"
                 android:id="@+id/line"/>
-        <android.support.design.button.MaterialButton
+        <Button
                 android:layout_width="100dp"
                 android:layout_height="50dp"
                 android:text="Log Out"

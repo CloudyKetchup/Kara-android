@@ -1,12 +1,14 @@
 package com.krypt0n.kara.Activities
 
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.krypt0n.kara.R
 import com.krypt0n.kara.Repository.Note
 import com.krypt0n.kara.Repository.notes
 import kotlinx.android.synthetic.main.activity_new_note.*
+import kotlinx.android.synthetic.main.login_activity.*
 
 class NewNoteActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

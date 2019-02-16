@@ -2,8 +2,9 @@ package com.krypt0n.kara.Repository
 
 import java.io.*
 
-var selected_item : Int = 0
-var openedNotes : Boolean = false
+var selected_item = 0
+var openedNotes = false
+var serverOnline = false
 //write file to local storage
 fun writeFile(file : String, list : ArrayList<Note>){
     Thread {

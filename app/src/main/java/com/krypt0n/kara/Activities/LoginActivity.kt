@@ -1,13 +1,17 @@
 package com.krypt0n.kara.Activities
 
+import android.content.Context
+import android.net.ConnectivityManager
 import android.os.Bundle
-import android.os.PersistableBundle
+import android.support.design.widget.Snackbar
 import android.support.design.widget.TextInputEditText
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.krypt0n.kara.Cloud.Database
 import com.krypt0n.kara.R
+import com.krypt0n.kara.Repository.serverOnline
 import kotlinx.android.synthetic.main.login_activity.*
+import java.net.InetAddress
 
 class LoginActivity : AppCompatActivity() {
     lateinit var login : String
@@ -21,26 +25,39 @@ class LoginActivity : AppCompatActivity() {
     }
     //function calling sign in from database
     fun signIn(v : View){
-        Database(filesDir).apply {
-            when {
-                login.isEmpty() -> login_field.error = "Field cannot be empty"
-                nameExist(login) -> {
-                    signIn(login,password)
-                    finish()
+        if (internetAvailable() || serverOnline) {
+            Database(filesDir).apply {
+                when {
+                    login.isEmpty() -> login_field.error = "Field cannot be empty"
+                    nameExist(login) -> {
+                        signIn(login, password)
+                        finish()
+                    }
+                    else -> login_field.error = "Account does not exist"
                 }
-                else -> login_field.error = "Account does not exist"
             }
+        }else {
+            Snackbar.make(login_activity_layout,"Hmm,something went wrong",Snackbar.LENGTH_LONG).show()
         }
     }
     //function calling sign up from database
     fun signUp(v : View){
-        Database(filesDir).apply {
-            if (nameExist(login))
-                login_field.error = "This account already exist"
-            else {
-                signUp(login, password)
-                finish()
+        if (internetAvailable() || serverOnline) {
+            Database(filesDir).apply {
+                if (nameExist(login))
+                    login_field.error = "This account already exist"
+                else {
+                    signUp(login, password)
+                    finish()
+                }
             }
         }
+    }
+    //check device internet connection
+    fun internetAvailable(): Boolean{
+        val connectivityManager = this.getSystemService(Context.CONNECTIVITY_SERVICE)
+                as ConnectivityManager
+        val networkInfo = connectivityManager.activeNetworkInfo
+        return networkInfo != null && networkInfo.isConnected
     }
 }
