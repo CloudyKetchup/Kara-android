@@ -4,7 +4,7 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#242633"
+                android:background="@color/Background"
                 tools:context=".Activities.NoteActivity"
                 app:errorEnabled="true">
 
@@ -21,7 +21,7 @@
                 android:layout_height="match_parent"
                 android:inputType="textShortMessage"
                 android:hint="Title"
-                android:textColor="#c7dbdc"
+                android:textColor="@color/White"
                 android:id="@+id/note_title_field"/>
     </android.support.design.widget.TextInputLayout>
 
@@ -43,7 +43,7 @@
             android:gravity="top"
             android:inputType="text|textMultiLine"
             android:hint="Text"
-            android:textColor="#c7dbdc"
+            android:textColor="@color/White"
             android:background="@drawable/edit_text_bg"
             android:theme="@style/TextFieldTheme"
             android:id="@+id/note_text_field"/>

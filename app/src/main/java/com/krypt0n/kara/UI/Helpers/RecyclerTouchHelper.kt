@@ -18,7 +18,7 @@ open class RecyclerTouchHelper
     }
     //remove note from list(recyclerview)
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
-        val foregroundView: RelativeLayout = (viewHolder as RecyclerAdapter.CustomViewHolder).view_foreground
+        val foregroundView: RelativeLayout = (viewHolder as RecyclerAdapter.CustomViewHolder).viewForeground
         getDefaultUIUtil().clearView(foregroundView)
     }
     //background of list item(red color,delete icon)
@@ -31,7 +31,7 @@ open class RecyclerTouchHelper
         actionState: Int,
         isCurrentlyActive: Boolean
     ) {
-        val foregroundView: RelativeLayout = (viewHolder as RecyclerAdapter.CustomViewHolder).view_foreground
+        val foregroundView: RelativeLayout = (viewHolder as RecyclerAdapter.CustomViewHolder).viewForeground
         getDefaultUIUtil().onDraw(c,recyclerView,foregroundView,dX / 2,dY / 2,actionState,isCurrentlyActive)
     }
     //item that appear above background
@@ -44,7 +44,7 @@ open class RecyclerTouchHelper
         actionState: Int,
         isCurrentlyActive: Boolean
     ) {
-        val foregroundView: RelativeLayout = (viewHolder as RecyclerAdapter.CustomViewHolder).view_foreground
+        val foregroundView: RelativeLayout = (viewHolder as RecyclerAdapter.CustomViewHolder).viewForeground
         getDefaultUIUtil().onDrawOver(c,recyclerView,foregroundView,dX,dY,actionState,isCurrentlyActive)
     }
 }

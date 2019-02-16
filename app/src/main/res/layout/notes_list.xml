@@ -8,7 +8,7 @@
             android:padding="15dp"
             android:layout_width="match_parent"
             android:layout_height="80dp"
-            android:background="#dd3334"
+            android:background="@color/Red"
             android:id="@+id/notes_view_background">
         <ImageView
                 android:layout_width="35dp"
@@ -29,7 +29,7 @@
             android:padding="15dp"
             android:layout_width="match_parent"
             android:layout_height="80dp"
-            android:background="#242633"
+            android:background="@color/Background"
             android:id="@+id/notes_view_foreground">
         <TextView
                 android:id="@+id/note_title"

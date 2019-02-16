@@ -3,7 +3,7 @@ package com.krypt0n.kara.Repository
 import java.io.*
 
 var selected_item : Int = 0
-var opened_notes : Boolean = false
+var openedNotes : Boolean = false
 //write file to local storage
 fun writeFile(file : String, list : ArrayList<Note>){
     Thread {

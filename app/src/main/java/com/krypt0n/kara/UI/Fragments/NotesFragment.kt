@@ -7,23 +7,18 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.krypt0n.kara.R
 import com.krypt0n.kara.Repository.notes
-import com.krypt0n.kara.Repository.opened_notes
-import com.krypt0n.kara.Repository.writeFile
+import com.krypt0n.kara.Repository.openedNotes
 import com.krypt0n.kara.UI.Adapters.RecyclerAdapter
 import com.krypt0n.kara.UI.Helpers.RecyclerTouchHelper
-import java.io.File
-import java.io.FileOutputStream
-import java.io.OutputStreamWriter
 
 class NotesFragment : Fragment() {
     init {
-        opened_notes = true
+        openedNotes = true
     }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val v = inflater.inflate(
@@ -31,8 +26,8 @@ class NotesFragment : Fragment() {
             container,
             false
         ) as View
-        val adapter = RecyclerAdapter(notes,this)
-        //recyclerview(shown list)
+        val adapter = RecyclerAdapter(notes)
+        //recyclerView(shown list)
         val recyclerView = v.findViewById(R.id.notes_recycler_view) as RecyclerView
         recyclerView.apply {
             layoutManager = LinearLayoutManager(activity)

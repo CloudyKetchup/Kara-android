@@ -8,7 +8,7 @@ import android.support.design.widget.BottomNavigationView.OnNavigationItemSelect
 import android.support.multidex.MultiDex
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
-import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
+import android.view.View
 import com.krypt0n.kara.Cloud.Account
 import com.krypt0n.kara.Cloud.Database
 import com.krypt0n.kara.R
@@ -18,6 +18,7 @@ import com.krypt0n.kara.Repository.trash
 import com.krypt0n.kara.Repository.writeFile
 import com.krypt0n.kara.UI.Fragments.NotesFragment
 import com.krypt0n.kara.UI.Fragments.TrashFragment
+import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
@@ -28,18 +29,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         //bottom navigation
-        val navigationView = findViewById<BottomNavigationViewEx>(R.id.bottom_navigation).apply {
+        bottom_navigation.apply {
             enableShiftingMode(false)
+            onNavigationItemSelectedListener = navListener
         }
-        //bottom navigation action listener
-        navigationView.onNavigationItemSelectedListener = navListener
 //        if (internetAvailable())
 //            database = Database(filesDir).apply {
-//                mongo_connected = true
+//                mongoConnected = true
 //            }
-//        loadAccount()
         loadFile("$filesDir","notes")
         loadFile("$filesDir","trash")
+//        loadAccount()
         openFragment(NotesFragment())
     }
     //multi dex
@@ -47,6 +47,7 @@ class MainActivity : AppCompatActivity() {
         super.attachBaseContext(base)
         MultiDex.install(this)
     }
+    //go to notes fragment after saved a note,etc...
     override fun onResume() {
         openFragment(NotesFragment())
         OnNavigationItemSelectedListener@
@@ -55,6 +56,7 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         finish()
     }
+    //save all changes when app is closed
     override fun onStop() {
         writeFile("$filesDir/notes", notes)
         writeFile("$filesDir/trash", trash)
@@ -72,11 +74,16 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.create_note -> {
                 startActivity(Intent(this, NewNoteActivity()::class.java))
+                return@OnNavigationItemSelectedListener true
             }
             R.id.settings -> {
                 return@OnNavigationItemSelectedListener true
             }
             R.id.account -> {
+//                if (account.name != null)
+//                    showPopup()
+//                else
+                startActivity(Intent(this,LoginActivity()::class.java))
                 return@OnNavigationItemSelectedListener true
             }
         }
@@ -99,7 +106,13 @@ class MainActivity : AppCompatActivity() {
         val name = user.get("name") as String
         val password = user.get("password") as String
         database.signIn(name, password)
-        account = Account(name, password)
+        account = database.localAccount
+    }
+    fun logOut(v : View){
+
+    }
+    private fun showPopup(){
+
     }
     //check device internet connection
     private fun internetAvailable(): Boolean{
