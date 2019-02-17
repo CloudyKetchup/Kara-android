@@ -1,8 +1,6 @@
 package com.krypt0n.kara.Cloud
 
-import android.support.v7.app.AppCompatActivity
 import com.mongodb.*
-import kotlinx.android.synthetic.main.login_activity.*
 import org.json.JSONObject
 import java.io.File
 import java.io.FileReader
@@ -22,12 +20,12 @@ class Database(files_dir : File) {
 
     init {
 //        Thread {
-            val mongo_client = MongoClient(ip, port)     //client used for connection
-            val database = mongo_client.getDB("Kara")   //database
+            val mongoClient = MongoClient(ip, port)     //client used for connection
+            val database = mongoClient.getDB("Kara")   //database
             users = database.getCollection("users")
             tempData = users.findOne()
             if (accFile.exists())
-                loadConfig()
+                config = JSONObject("$files_dir/acc_config.json")
             else
                 createConfig()
 //        }.start()
@@ -67,10 +65,6 @@ class Database(files_dir : File) {
         config = JSONObject()
         config.put("user",JSONObject())
         writeConfig(config)
-    }
-    private fun loadConfig() {
-        val fr = FileReader(accFile)
-        config = fr.read() as JSONObject
     }
     private fun writeConfig(config : JSONObject){
         val fw  = FileWriter(accFile)

@@ -18,11 +18,13 @@ import com.krypt0n.kara.Cloud.Database
 import com.krypt0n.kara.R
 import com.krypt0n.kara.Repository.*
 import com.krypt0n.kara.UI.Fragments.NotesFragment
+import com.krypt0n.kara.UI.Fragments.SettingsFragment
 import com.krypt0n.kara.UI.Fragments.TrashFragment
 import kotlinx.android.synthetic.main.account_popup.*
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONObject
 import java.io.File
+import java.io.FileOutputStream
 import java.io.PrintStream
 import java.net.InetAddress
 
@@ -44,7 +46,8 @@ class MainActivity : AppCompatActivity() {
 //            }
 //        loadAccount()
         openFragment(NotesFragment())
-        if (internetAvailable()) checkServer()
+        checkInternet()
+        if (internetAvailable) checkServer()
         loadFile("$filesDir","notes")
         loadFile("$filesDir","trash")
     }
@@ -83,13 +86,14 @@ class MainActivity : AppCompatActivity() {
                 return@OnNavigationItemSelectedListener true
             }
             R.id.settings -> {
+                openFragment(SettingsFragment())
                 return@OnNavigationItemSelectedListener true
             }
             R.id.account -> {
 //                if (account.name != null)
-//                    showPopup()
+                    showPopup()
 //                else
-                    startActivity(Intent(this,LoginActivity()::class.java))
+//                    startActivity(Intent(this,LoginActivity()::class.java))
                 return@OnNavigationItemSelectedListener true
             }
         }
@@ -114,6 +118,7 @@ class MainActivity : AppCompatActivity() {
         database.signIn(name, password)
         account = database.localAccount
     }
+    //create account dialog and show it
     private fun showPopup(){
         Dialog(this).apply {
             setContentView(R.layout.account_popup)
@@ -123,15 +128,16 @@ class MainActivity : AppCompatActivity() {
             }
             logout_button.setOnClickListener {
                 logOut()
+                dismiss()
             }
         }.show()
     }
     //check device internet connection
-    private fun internetAvailable(): Boolean{
-        val connectivityManager = this.getSystemService(Context.CONNECTIVITY_SERVICE)
-                as ConnectivityManager
-        val networkInfo = connectivityManager.activeNetworkInfo
-        return networkInfo != null && networkInfo.isConnected
+    private fun checkInternet(){
+        (this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).apply {
+            if (activeNetworkInfo != null && activeNetworkInfo.isConnected)
+                internetAvailable = true
+        }
     }
     //check if server is alive
     private fun checkServer(){
@@ -144,19 +150,25 @@ class MainActivity : AppCompatActivity() {
     }
     //log out procedure,will delete all data
     private fun logOut(){
-        try {
-            File("$filesDir/notes").delete()
-            File("$filesDir/trash").delete()
-            File("$filesDir/acc_config.json").delete()
-            account = null
-            notes.clear()
-            trash.clear()
-        }catch (e : Exception){
-            val f = File("$filesDir/log.txt")
-            val p = PrintStream(f)
-            e.printStackTrace(p)
-        }finally {
-            Snackbar.make(root_layout, "Good Bye ;)", Snackbar.LENGTH_LONG).show()
-        }
+        Thread {
+            try {
+                account = null
+                notes.clear()
+                trash.clear()
+                //files to be deleted
+                val files = arrayOf("notes", "trash", "acc_config.json")
+                for (i in files.indices) {
+//                    File("$filesDir/${files[i]}").delete()
+                    deleteFile(files[i])
+                }
+            } catch (e: Exception) {
+                val f = File("$filesDir/log.txt")
+                val p = PrintStream(f)
+                e.printStackTrace(p)
+            } finally {
+                openFragment(NotesFragment())
+                Snackbar.make(root_layout, "Good Bye ;)", Snackbar.LENGTH_LONG).show()
+            }
+        }.start()
     }
 }

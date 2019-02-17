@@ -5,6 +5,8 @@ import java.io.*
 var selected_item = 0
 var openedNotes = false
 var serverOnline = false
+var internetAvailable = false
+var cloudSync = false
 //write file to local storage
 fun writeFile(file : String, list : ArrayList<Note>){
     Thread {
