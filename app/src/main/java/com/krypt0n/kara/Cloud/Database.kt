@@ -1,14 +1,20 @@
 package com.krypt0n.kara.Cloud
 
+import android.support.design.widget.Snackbar
+import android.support.v7.app.AppCompatActivity
+import com.krypt0n.kara.Activities.LoginActivity
+import com.krypt0n.kara.Activities.MainActivity
 import com.mongodb.*
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.login_activity.*
 import org.json.JSONObject
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 
 // MongoDB database
-class Database(files_dir : File) {
-    private val ip = "92.181.71.184"
+class Database(files_dir : File,val activity: AppCompatActivity) {
+    private val ip = "192.168.43.35"
     private val port = 27017
     private var users : DBCollection     //mongo collection
     private var tempData : DBObject     //get collection for future use
@@ -40,8 +46,10 @@ class Database(files_dir : File) {
         if (accPassword == password){
             localAccount = Account(accName, accPassword)
             updateConfig(accName,accPassword)
+            LoginActivity().finish()
+            Snackbar.make(activity.root_layout,"Welcome back ;)", Snackbar.LENGTH_LONG).show()
         }else{
-//            AppCompatActivity().password_field.error = "Wrong password"
+            activity.password_field.error = "Wrong password"
         }
     }
     fun signUp(login : String,password: String){

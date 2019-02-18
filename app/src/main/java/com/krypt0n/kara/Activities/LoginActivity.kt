@@ -26,7 +26,7 @@ class LoginActivity : AppCompatActivity() {
     //function calling sign in from database
     fun signIn(v : View){
         if (internetAvailable() || serverOnline) {
-            Database(filesDir).apply {
+            Database(filesDir,this).apply {
                 when {
                     login.isEmpty() -> login_field.error = "Field cannot be empty"
                     nameExist(login) -> {
@@ -43,7 +43,7 @@ class LoginActivity : AppCompatActivity() {
     //function calling sign up from database
     fun signUp(v : View){
         if (internetAvailable() || serverOnline) {
-            Database(filesDir).apply {
+            Database(filesDir,this).apply {
                 if (nameExist(login))
                     login_field.error = "This account already exist"
                 else {

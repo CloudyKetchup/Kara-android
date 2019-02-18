@@ -19,7 +19,7 @@ class Cloud(val location : String) {
         if (ftpConnected) {
             //go to user folder
             client.changeWorkingDirectory(dirPath)
-            val returnCode = client.getReplyCode()
+            val returnCode = client.replyCode
             if (returnCode == 550) {
                 return false
             }

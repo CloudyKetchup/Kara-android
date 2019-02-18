@@ -12,7 +12,6 @@ import android.support.design.widget.Snackbar
 import android.support.multidex.MultiDex
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
-import android.view.View
 import com.krypt0n.kara.Cloud.Account
 import com.krypt0n.kara.Cloud.Database
 import com.krypt0n.kara.R
@@ -24,9 +23,9 @@ import kotlinx.android.synthetic.main.account_popup.*
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONObject
 import java.io.File
-import java.io.FileOutputStream
 import java.io.PrintStream
-import java.net.InetAddress
+import java.net.InetSocketAddress
+import java.net.Socket
 
 class MainActivity : AppCompatActivity() {
     lateinit var database : Database
@@ -38,16 +37,20 @@ class MainActivity : AppCompatActivity() {
         //bottom navigation
         bottom_navigation.apply {
             enableShiftingMode(false)
+            enableAnimation(false)
+//            setTextVisibility(false)
+//            setIconSize(25f)
             onNavigationItemSelectedListener = navListener
         }
-//        if (internetAvailable())
-//            database = Database(filesDir).apply {
-//                mongoConnected = true
-//            }
 //        loadAccount()
         openFragment(NotesFragment())
         checkInternet()
         if (internetAvailable) checkServer()
+        if (serverOnline) {
+            database = Database(filesDir, this).apply {
+                mongoConnected = true
+            }
+        }
         loadFile("$filesDir","notes")
         loadFile("$filesDir","trash")
     }
@@ -91,9 +94,9 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.account -> {
 //                if (account.name != null)
-                    showPopup()
+//                    showPopup()
 //                else
-//                    startActivity(Intent(this,LoginActivity()::class.java))
+                    startActivity(Intent(this,LoginActivity()::class.java))
                 return@OnNavigationItemSelectedListener true
             }
         }
@@ -142,10 +145,19 @@ class MainActivity : AppCompatActivity() {
     //check if server is alive
     private fun checkServer(){
         Thread {
-            if (InetAddress.getByName("92.181.71.184").isReachable(4))
-                serverOnline = true
-            else
+            try{
+                Socket().apply {
+                    connect(InetSocketAddress("192.168.43.35", 27017))
+                    serverOnline = true
+                    Snackbar.make(root_layout, "Server Online", Snackbar.LENGTH_LONG).show()
+                    close()
+                }
+            }catch (e : Exception){
                 Snackbar.make(root_layout, "Server Offline", Snackbar.LENGTH_LONG).show()
+                val f = File("$filesDir/log.txt")
+                val p = PrintStream(f)
+                e.printStackTrace(p)
+            }
         }.start()
     }
     //log out procedure,will delete all data

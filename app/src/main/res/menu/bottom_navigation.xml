@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id = "@+id/notes"
-          android:icon="@drawable/ic_content_notes_24dp"
+          android:icon="@drawable/ic_notes"
           android:title="Notes"/>
     <item android:id = "@+id/trash"
           android:icon="@drawable/ic_trash"
