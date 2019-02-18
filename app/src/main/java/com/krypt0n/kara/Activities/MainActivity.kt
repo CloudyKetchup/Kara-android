@@ -14,11 +14,13 @@ import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import com.krypt0n.kara.Cloud.Account
 import com.krypt0n.kara.Cloud.Database
+import com.krypt0n.kara.Cloud.JDatabase
 import com.krypt0n.kara.R
 import com.krypt0n.kara.Repository.*
 import com.krypt0n.kara.UI.Fragments.NotesFragment
 import com.krypt0n.kara.UI.Fragments.SettingsFragment
 import com.krypt0n.kara.UI.Fragments.TrashFragment
+import com.mongodb.MongoClient
 import kotlinx.android.synthetic.main.account_popup.*
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONObject
@@ -38,19 +40,16 @@ class MainActivity : AppCompatActivity() {
         bottom_navigation.apply {
             enableShiftingMode(false)
             enableAnimation(false)
-//            setTextVisibility(false)
-//            setIconSize(25f)
             onNavigationItemSelectedListener = navListener
         }
 //        loadAccount()
         openFragment(NotesFragment())
         checkInternet()
         if (internetAvailable) checkServer()
-        if (serverOnline) {
-            database = Database(filesDir, this).apply {
-                mongoConnected = true
-            }
-        }
+//        if (serverOnline) {
+//            database = Database(this)
+//        }
+        JDatabase(this).init()
         loadFile("$filesDir","notes")
         loadFile("$filesDir","trash")
     }
@@ -147,9 +146,9 @@ class MainActivity : AppCompatActivity() {
         Thread {
             try{
                 Socket().apply {
-                    connect(InetSocketAddress("192.168.43.35", 27017))
+                    connect(InetSocketAddress("192.168.0.14", 10000))
                     serverOnline = true
-                    Snackbar.make(root_layout, "Server Online", Snackbar.LENGTH_LONG).show()
+//                    Snackbar.make(root_layout, "Server Online", Snackbar.LENGTH_LONG).show()
                     close()
                 }
             }catch (e : Exception){
