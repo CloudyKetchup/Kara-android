@@ -17,7 +17,7 @@ import java.io.PrintStream
 // MongoDB database
 class Database(val activity: AppCompatActivity) {
     lateinit var client : MongoClient   //client for connecting to Database
-    private lateinit var users : DBCollection     //collection of users
+    lateinit var users : DBCollection     //collection of users
     lateinit var tempData : DBObject     //get collection for future use
     lateinit var acc : BasicDBObject
     lateinit var localAccount : Account
