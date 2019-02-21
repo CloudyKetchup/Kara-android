@@ -14,7 +14,6 @@ import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import com.krypt0n.kara.Cloud.Account
 import com.krypt0n.kara.Cloud.Database
-import com.krypt0n.kara.Cloud.JDatabase
 import com.krypt0n.kara.R
 import com.krypt0n.kara.Repository.*
 import com.krypt0n.kara.UI.Fragments.NotesFragment
@@ -49,7 +48,6 @@ class MainActivity : AppCompatActivity() {
 //        if (serverOnline) {
 //            database = Database(this)
 //        }
-        JDatabase(this).init()
         loadFile("$filesDir","notes")
         loadFile("$filesDir","trash")
     }

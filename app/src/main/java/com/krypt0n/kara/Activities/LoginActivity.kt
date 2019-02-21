@@ -1,64 +1,76 @@
 package com.krypt0n.kara.Activities
 
+import android.annotation.SuppressLint
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.design.widget.TextInputEditText
 import android.support.v7.app.AppCompatActivity
+import android.view.LayoutInflater
 import android.view.View
-import com.krypt0n.kara.Cloud.Database
+import android.widget.Toast
+import com.krypt0n.kara.Network.RetrofitClient
+import com.krypt0n.kara.Network.ServerService
 import com.krypt0n.kara.R
-import com.krypt0n.kara.Repository.mongoConnected
-import com.krypt0n.kara.Repository.serverOnline
+import com.krypt0n.kara.Repository.*
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.login_activity.*
-import java.io.File
-import java.io.PrintStream
+import kotlinx.android.synthetic.main.registration_layout.*
 
-
-class LoginActivity : AppCompatActivity() {
-    lateinit var login : String
-    lateinit var password : String
+class LoginActivity : AppCompatActivity(){
+    private val compositeDisposable = CompositeDisposable()
+    private lateinit var serverService : ServerService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login_activity)
-//        login = findViewById<TextInputEditText>(R.id.login_field).text.toString().trim()
-        password = findViewById<TextInputEditText>(R.id.password_field).text.toString().trim()
+
+        //init ServerService
+        val retrofitClient = RetrofitClient.getInstance()
+        serverService = retrofitClient.create(ServerService::class.java)
     }
-    //function calling sign in from database
-    fun signIn(v : View){
-        if (serverOnline || mongoConnected) {
-            try {
-                val database = Database(this)
-                when {
-                    login_field.text.isNullOrEmpty() -> errorMessage("Field cannot be empty")
-                    database.nameExist(login_field.text.toString().trim()) -> database.signIn(login_field.text.toString().trim(), password)
-                    else -> errorMessage("Account does not exist")
-                }
-            } catch (e: Exception) {
-                val f = File("$filesDir/log.txt")
-                val p = PrintStream(f)
-                e.printStackTrace(p)
-                Snackbar.make(login_activity_layout, "Hmm,something went wrong", Snackbar.LENGTH_LONG).show()
+    override fun onStop() {
+        compositeDisposable.clear()
+        super.onStop()
+    }
+    fun signUpView(v : View){
+        val view = LayoutInflater.from(login_activity_layout.context)
+            .inflate(R.layout.registration_layout,null)
+    }
+    fun loginUser(v : View){
+        val email = findViewById<TextInputEditText>(R.id.email_field).text.toString()
+        val password = findViewById<TextInputEditText>(R.id.password_field).text.toString()
+        when {
+            email.isEmpty() -> email_field.error = "Email cannot be empty"
+            password.isEmpty() -> password_field.error = "Password cannot be empty"
+            else -> {
+                if (serverOnline){
+                    compositeDisposable.add(serverService.loginUser(email,password)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe { response ->
+                            Toast.makeText(login_activity_layout.context, response, Toast.LENGTH_SHORT).show()
+                        })
+                }else
+                    Toast.makeText(login_activity_layout.context,"You are offline", Toast.LENGTH_SHORT).show()
             }
-        } else {
-            Snackbar.make(login_activity_layout, "Hmm,something went wrong", Snackbar.LENGTH_LONG).show()
         }
     }
-    private fun errorMessage(message : String){
-        runOnUiThread {
-            login_field.error = message
-        }
-    }
-    //function calling sign up from database
-    fun signUp(v : View){
-        if (serverOnline || mongoConnected) {
-            Database(this).apply {
-                if (nameExist(login))
-                    login_field.error = "This account already exist"
-                else {
-                    signUp(login, password)
-                    finish()
-                }
+    fun registerUser(v : View){
+        val email = registration_email_field.text.toString()
+        val name  = registration_name_field.text.toString()
+        val password = registration_password_field.text.toString()
+        when {
+            email.isEmpty() -> registration_email_field.error = "Email cannot be empty"
+            name.isEmpty() -> registration_name_field.error = "Name cannot be empty"
+            password.isEmpty() -> registration_password_field.error = "Password cannot be empty"
+            else -> {
+                compositeDisposable.add(serverService.registerUser(email,name,password)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { response ->
+                        Toast.makeText(login_activity_layout.context,response,Toast.LENGTH_SHORT).show()
+                    })
             }
         }
     }

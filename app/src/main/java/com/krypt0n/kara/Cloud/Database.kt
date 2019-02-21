@@ -3,12 +3,12 @@ package com.krypt0n.kara.Cloud
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import com.krypt0n.kara.Repository.mongoConnected
-import com.mongodb.*
-import com.mongodb.client.MongoClients
-import com.mongodb.client.MongoCollection
+import com.mongodb.BasicDBObject
+import com.mongodb.DBCollection
+import com.mongodb.DBObject
+import com.mongodb.MongoClient
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.login_activity.*
-import org.bson.Document
 import org.json.JSONObject
 import java.io.File
 import java.io.FileWriter
@@ -63,7 +63,7 @@ class Database(val activity: AppCompatActivity) {
                 activity.password_field.error = "Wrong password"
             }
         }else
-            activity.login_field.error = "This account does not exist"
+            activity.email_field.error = "This account does not exist"
     }
     fun signUp(login : String,password: String){
         users.insert(
