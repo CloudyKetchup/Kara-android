@@ -1,4 +1,4 @@
-package com.krypt0n.kara.Network;
+package com.krypt0n.kara.Remote;
 
 import io.reactivex.Observable;
 import retrofit2.http.Field;

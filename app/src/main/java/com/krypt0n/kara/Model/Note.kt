@@ -1,4 +1,4 @@
-package com.krypt0n.kara.Repository
+package com.krypt0n.kara.Model
 
 import java.io.Serializable
 

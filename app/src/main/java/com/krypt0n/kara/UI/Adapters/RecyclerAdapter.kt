@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.krypt0n.kara.Activities.NoteActivity
+import com.krypt0n.kara.Model.Note
 import com.krypt0n.kara.R
 import com.krypt0n.kara.Repository.*
 import java.util.regex.Pattern

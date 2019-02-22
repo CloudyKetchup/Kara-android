@@ -33,7 +33,7 @@
                     android:theme="@style/AppTheme.NoActionBar">
             </activity>
             <activity
-                    android:name=".Activities.LoginActivity"
+                    android:name=".Activities.AccountActivity"
                     android:theme="@style/AppTheme.NoActionBar">
             </activity>
     </application>

@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/Background"
-        tools:context=".Activities.LoginActivity"
+        tools:context=".Activities.AccountActivity"
         android:id="@+id/login_activity_layout">
     <ImageView
             android:layout_width="150dp"
@@ -81,7 +81,7 @@
             android:text="Create new account"
             android:textColor="@color/White"
             android:layout_marginTop="15dp"
-            android:onClick="signUpView"
+            android:onClick="registrationView"
             tools:layout_editor_absoluteY="412dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

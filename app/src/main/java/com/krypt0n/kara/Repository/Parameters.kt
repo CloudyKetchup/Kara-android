@@ -1,12 +1,20 @@
 package com.krypt0n.kara.Repository
 
+import com.krypt0n.kara.Model.Note
 import java.io.*
 
+//parameters
+var filesDirectory = ""
 var selected_item = 0
 var openedNotes = false
-var serverOnline = false
-var internetAvailable = false
-var cloudSync = false
+var serverOnline = false                  //Server Alive
+var internetAvailable = false             //Device internet connection
+var ftpConnected = false
+var cloudSync = false                     //Cloud Backup on/off
+const val ip = "192.168.0.14"             //Server ip
+const val ftpPort = 2221                  //FTP connection port
+const val databaseServicePort = 3000      //Server service port
+
 //write file to local storage
 fun writeFile(file : String, list : ArrayList<Note>){
     Thread {
@@ -21,7 +29,7 @@ fun writeFile(file : String, list : ArrayList<Note>){
         }
     }.start()
 }
-//load notes/trash from file on local storage
+//load file from local storage
 fun loadFile(directory: String,file: String) {
     Thread {
         val f = File("$directory/$file")

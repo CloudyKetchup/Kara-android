@@ -1,79 +1,74 @@
 package com.krypt0n.kara.Cloud
 
+import android.annotation.SuppressLint
+import android.widget.Toast
+import com.krypt0n.kara.Repository.ftpConnected
+import com.krypt0n.kara.Repository.ftpPort
 import com.krypt0n.kara.Repository.internetAvailable
+import com.krypt0n.kara.Repository.ip
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import org.apache.commons.net.ftp.FTPClient
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 
-/* Cloud.Cloud backup that use FTP for remote file upload and download */
-class Cloud(val location : String) {
-    private lateinit var ftpFolder : String    //user folder on server
-	private val client = FTPClient()     //ftp client for connecting
-    private val ip = "192.168.0.11"  //server ip
-    private val port = 2221                       //connection port
-    private var ftpConnected = false
+/* Cloud backup that use FTP for remote file upload and download */
+object Cloud {
+    //user folder on server
+    private val ftpFolder = "${System.getProperty("user.name")}/Kara/${Account.name}"
+    //ftp client for connecting
+    private val client = FTPClient()
 
+    //connect to server via ftp
+    @SuppressLint("CheckResult")
+    fun connect() {
+        if (internetAvailable) {
+            try {
+                client.connect(ip,ftpPort)
+                client.login("francis", "francis")
+                ftpConnected = true
+            }catch (e : Exception){}
+        }
+    }
     //check if user folder on server exist
-	private fun ftpDirectoryExist(dirPath : String) : Boolean{
+	private fun ftpDirectoryCheck(dirPath : String){
         if (ftpConnected) {
             //go to user folder
             client.changeWorkingDirectory(dirPath)
-            val returnCode = client.replyCode
-            if (returnCode == 550) {
-                return false
+            //create folder if missing
+            if (client.replyCode == 550) {
+                client.makeDirectory(ftpFolder)
             }
         }
-        return true
     }
-    //check if buckup file on server exist
+    //check if backup file on server exist
     private fun backupExist(filePath : String) : Boolean {
         if (ftpConnected) {
             val inputStream = client.retrieveFileStream(filePath)
-            val returnCode = client.getReplyCode();
-            if (inputStream == null || returnCode == 550) {
+            if (inputStream == null || client.replyCode == 550) {
                 return false
             }
         }
         return true
     }
-    //connect to server via ftp
-    fun ftpConnect() {
-        if (internetAvailable) {
-            try {
-                client.connect(ip, port)
-                client.login("francis", "francis")
-                ftpConnected = true
-            } catch (e : IOException) {
-            }
-        }
-    }
     //make backup
-    fun upload(type : String) {
-        //background thread for uploading
-        Thread {
-            try {
-                if (ftpConnected) {
-                    if (!ftpDirectoryExist(ftpFolder)) {
-                        //create folder if missing
-                        client.makeDirectory(ftpFolder)
-                    }
-                    //upload
-                    client.storeFile(type,FileInputStream(location + type))
-                }
-            } catch (e : IOException) {}
-        }.start()
-    }
-    fun sync(type : String) {
+    fun upload(file : String) {
         try {
-            //check if buckup exist
-            if (ftpConnected){
-                if(backupExist(ftpFolder + type)) {
-                    client.changeWorkingDirectory(ftpFolder)
+            ftpDirectoryCheck(ftpFolder)
+            //upload backup to server
+            client.storeFile(file, FileInputStream(ftpFolder + file))
+        }catch (e : Exception){}
+    }
+    fun sync(file : String) {
+        try {
+            //check if backup exist
+            if(backupExist(ftpFolder + file)) {
+                client.apply {
+                    changeWorkingDirectory(ftpFolder)
                     //downloading file to app folder
-                    client.retrieveFile(type,FileOutputStream(location + type))
-                    /*TODO
-                    * add snackbar*/
+                    retrieveFile(file,FileOutputStream(ftpFolder + file))
                 }
             }
         } catch (e : IOException) {}

@@ -12,26 +12,22 @@ import android.support.design.widget.Snackbar
 import android.support.multidex.MultiDex
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
+import com.google.gson.JsonObject
 import com.krypt0n.kara.Cloud.Account
-import com.krypt0n.kara.Cloud.Database
 import com.krypt0n.kara.R
 import com.krypt0n.kara.Repository.*
+import com.krypt0n.kara.UI.Fragments.EmptyListFragment
 import com.krypt0n.kara.UI.Fragments.NotesFragment
 import com.krypt0n.kara.UI.Fragments.SettingsFragment
 import com.krypt0n.kara.UI.Fragments.TrashFragment
-import com.mongodb.MongoClient
 import kotlinx.android.synthetic.main.account_popup.*
 import kotlinx.android.synthetic.main.activity_main.*
-import org.json.JSONObject
 import java.io.File
 import java.io.PrintStream
 import java.net.InetSocketAddress
 import java.net.Socket
 
 class MainActivity : AppCompatActivity() {
-    lateinit var database : Database
-    var account : Account? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -41,15 +37,26 @@ class MainActivity : AppCompatActivity() {
             enableAnimation(false)
             onNavigationItemSelectedListener = navListener
         }
-//        loadAccount()
-        openFragment(NotesFragment())
+        //will open fragment depending on notes list size
+        if (notes.isEmpty())
+            openFragment(EmptyListFragment())
+        else
+            openFragment(NotesFragment())
+        //check device connection to internet for future tasks
         checkInternet()
-        if (internetAvailable) checkServer()
-//        if (serverOnline) {
-//            database = Database(this)
-//        }
+        //check if server is alive
+        if (internetAvailable)
+            checkServer()
+        filesDirectory = filesDir.toString()
+        //load notes from file to and place them in arraylist
         loadFile("$filesDir","notes")
         loadFile("$filesDir","trash")
+        //account initialization,also from file if exist
+        if (File("$filesDir/acc_config.json").exists())
+            loadAccount()
+//        if (serverOnline || Account.name != null){
+//            Cloud.connect()
+//        }
     }
     //multi dex
     override fun attachBaseContext(base : Context) {
@@ -58,8 +65,10 @@ class MainActivity : AppCompatActivity() {
     }
     //go to notes fragment after saved a note,etc...
     override fun onResume() {
-        openFragment(NotesFragment())
-        OnNavigationItemSelectedListener@
+        if (notes.isEmpty())
+            openFragment(EmptyListFragment())
+        else
+            openFragment(NotesFragment())
         super.onResume()
     }
     override fun onBackPressed() {
@@ -74,11 +83,17 @@ class MainActivity : AppCompatActivity() {
     private var navListener = OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.notes -> {
-                openFragment(NotesFragment())
+                if (notes.isEmpty())
+                    openFragment(EmptyListFragment())
+                else
+                    openFragment(NotesFragment())
                 return@OnNavigationItemSelectedListener true
             }
             R.id.trash -> {
-                openFragment(TrashFragment())
+                if (trash.isEmpty())
+                    openFragment(EmptyListFragment())
+                else
+                    openFragment(TrashFragment())
                 return@OnNavigationItemSelectedListener true
             }
             R.id.create_note -> {
@@ -90,10 +105,10 @@ class MainActivity : AppCompatActivity() {
                 return@OnNavigationItemSelectedListener true
             }
             R.id.account -> {
-//                if (account.name != null)
-//                    showPopup()
-//                else
-                    startActivity(Intent(this,LoginActivity()::class.java))
+                if (File("$filesDir/acc_config.json").exists())
+                    showPopup()
+                else
+                    startActivity(Intent(this,AccountActivity()::class.java))
                 return@OnNavigationItemSelectedListener true
             }
         }
@@ -102,27 +117,29 @@ class MainActivity : AppCompatActivity() {
     //open fragment containing note list (notes/trash)
     private fun openFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fragment_container, fragment)
+            replace(R.id.fragment_container,fragment)
             addToBackStack(null)
             commit()
         }
     }
-    //use account config from device if exist
+    //load account data from file acc_config.json
     private fun loadAccount() {
-        //assign config from database if not null
-        val config = database.config
-        //and get all data required
-        val user = config.get("user") as JSONObject
-        val name = user.get("name") as String
-        val password = user.get("password") as String
-        database.signIn(name, password)
-        account = database.localAccount
+        Account.apply {
+            loadConfig()
+            //get all data required
+            val user = config.get("user") as JsonObject
+            name = user.get("name").toString()
+            email = user.get("email").toString()
+            password = user.get("password").toString()
+        }
     }
-    //create account dialog and show it
+    //account dialog
     private fun showPopup(){
         Dialog(this).apply {
             setContentView(R.layout.account_popup)
             window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            account_name_field.text = Account.name
+            account_email_field.text = Account.email
             close_popup.setOnClickListener {
                 dismiss()
             }
@@ -144,16 +161,12 @@ class MainActivity : AppCompatActivity() {
         Thread {
             try{
                 Socket().apply {
-                    connect(InetSocketAddress("192.168.0.14", 10000))
+                    connect(InetSocketAddress(ip, databaseServicePort))
                     serverOnline = true
-//                    Snackbar.make(root_layout, "Server Online", Snackbar.LENGTH_LONG).show()
                     close()
                 }
             }catch (e : Exception){
-                Snackbar.make(root_layout, "Server Offline", Snackbar.LENGTH_LONG).show()
-                val f = File("$filesDir/log.txt")
-                val p = PrintStream(f)
-                e.printStackTrace(p)
+                serverOnline = false
             }
         }.start()
     }
@@ -161,7 +174,6 @@ class MainActivity : AppCompatActivity() {
     private fun logOut(){
         Thread {
             try {
-                account = null
                 notes.clear()
                 trash.clear()
                 //files to be deleted
