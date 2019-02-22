@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import com.google.gson.JsonObject
 import com.krypt0n.kara.Cloud.Account
+import com.krypt0n.kara.Cloud.Cloud
 import com.krypt0n.kara.R
 import com.krypt0n.kara.Repository.*
 import com.krypt0n.kara.UI.Fragments.EmptyListFragment
@@ -54,9 +55,6 @@ class MainActivity : AppCompatActivity() {
         //account initialization,also from file if exist
         if (File("$filesDir/acc_config.json").exists())
             loadAccount()
-//        if (serverOnline || Account.name != null){
-//            Cloud.connect()
-//        }
     }
     //multi dex
     override fun attachBaseContext(base : Context) {
@@ -78,6 +76,12 @@ class MainActivity : AppCompatActivity() {
     override fun onStop() {
         writeFile("$filesDir/notes", notes)
         writeFile("$filesDir/trash", trash)
+        if (logedIn){
+            Cloud.apply {
+                upload("notes","$filesDir/notes")
+                upload("trash","$filesDir/trash")
+            }
+        }
         super.onStop()
     }
     private var navListener = OnNavigationItemSelectedListener { item ->
@@ -131,6 +135,7 @@ class MainActivity : AppCompatActivity() {
             name = user.get("name").toString()
             email = user.get("email").toString()
             password = user.get("password").toString()
+            logedIn = true
         }
     }
     //account dialog

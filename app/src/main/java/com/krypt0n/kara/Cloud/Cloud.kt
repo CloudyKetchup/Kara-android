@@ -1,47 +1,39 @@
 package com.krypt0n.kara.Cloud
 
-import android.annotation.SuppressLint
-import android.widget.Toast
 import com.krypt0n.kara.Repository.ftpConnected
-import com.krypt0n.kara.Repository.ftpPort
-import com.krypt0n.kara.Repository.internetAvailable
 import com.krypt0n.kara.Repository.ip
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import org.apache.commons.net.ftp.FTPClient
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.IOException
+import java.io.*
 
 /* Cloud backup that use FTP for remote file upload and download */
 object Cloud {
     //user folder on server
-    private val ftpFolder = "${System.getProperty("user.home")}/Kara/${Account.name}"
+    private val ftpFolder = "Documents/Kara/${Account.name}/"
     //ftp client for connecting
     private val client = FTPClient()
 
-    //connect to server via ftp
-    @SuppressLint("CheckResult")
-    fun connect() {
-        if (internetAvailable) {
-            try {
-                client.connect(ip,ftpPort)
-                client.login("francis", "francis")
-                ftpConnected = true
-            }catch (e : Exception){}
+    private fun connectFTP() {
+        client.apply {
+            connect(ip)
+            login("krypt0n", "1708")
+            enterLocalPassiveMode()
         }
     }
-    //check if user folder on server exist
-	private fun ftpDirectoryCheck(dirPath : String){
-        if (ftpConnected) {
-            //go to user folder
-            client.changeWorkingDirectory(dirPath)
-            //create folder if missing
-            if (client.replyCode == 550) {
-                client.makeDirectory(ftpFolder)
-            }
+    private fun disconnectFTP(){
+        client.apply {
+            logout()
+            disconnect()
         }
+    }
+    //check if user directory exist
+    private fun userFolderExist() : Boolean{
+        if (client.changeWorkingDirectory(ftpFolder))
+            return true
+        return false
+    }
+    //create user directory
+    private fun createDirectory(){
+        client.makeDirectory(ftpFolder)
     }
     //check if backup file on server exist
     private fun backupExist(filePath : String) : Boolean {
@@ -53,24 +45,42 @@ object Cloud {
         }
         return true
     }
-    //make backup
-    fun upload(file : String) {
-        try {
-            ftpDirectoryCheck(ftpFolder)
-            //upload backup to server
-            client.storeFile(file, FileInputStream(ftpFolder + file))
-        }catch (e : Exception){}
+    //upload backup to cloud
+    fun upload(fileName : String,fileForUpload : String) {
+        Thread {
+            try{
+                if (File(fileForUpload).exists()) {
+                    //connectFTP to server ftp
+                    connectFTP()
+                    //create user folder if missing
+                    if (!userFolderExist())
+                        createDirectory()
+                    //upload procedure
+                    client.apply {
+                        changeWorkingDirectory(ftpFolder)
+                        //upload backup to server
+                        storeFile(fileName, BufferedInputStream(FileInputStream(fileForUpload)))
+                    }
+                    disconnectFTP()
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }.start()
     }
-    fun sync(file : String) {
+    fun sync(file : String,fileLocation : String) {
         try {
             //check if backup exist
-            if(backupExist(ftpFolder + file)) {
+            if (backupExist(ftpFolder + file)) {
+                //retrieve backup from cloud
                 client.apply {
                     changeWorkingDirectory(ftpFolder)
                     //downloading file to app folder
-                    retrieveFile(file,FileOutputStream(ftpFolder + file))
+                    retrieveFile(file,FileOutputStream(fileLocation))
                 }
             }
-        } catch (e : IOException) {}
+        } catch (e : IOException) {
+            e.printStackTrace()
+        }
     }
 }
