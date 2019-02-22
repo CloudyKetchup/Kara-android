@@ -17,7 +17,7 @@ import java.io.IOException
 /* Cloud backup that use FTP for remote file upload and download */
 object Cloud {
     //user folder on server
-    private val ftpFolder = "${System.getProperty("user.name")}/Kara/${Account.name}"
+    private val ftpFolder = "${System.getProperty("user.home")}/Kara/${Account.name}"
     //ftp client for connecting
     private val client = FTPClient()
 
