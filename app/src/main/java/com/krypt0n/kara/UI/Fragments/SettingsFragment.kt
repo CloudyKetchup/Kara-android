@@ -2,9 +2,11 @@ package com.krypt0n.kara.UI.Fragments
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.SwitchCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Switch
 import com.krypt0n.kara.R
 import com.krypt0n.kara.Repository.cloudSync
 import kotlinx.android.synthetic.main.settings_fragment.*
@@ -19,14 +21,15 @@ class SettingsFragment : Fragment() {
             container,
             false
         ) as View
+        val syncSwitch = v.findViewById<SwitchCompat>(R.id.sync_switch)
         val settingsFile = "${v.context.filesDir}/settings.json"
         //set settings switch for synchronization depending on settings file if that exist
         if (File(settingsFile).exists())
             if (JSONObject(settingsFile).get("cloudSync") as Boolean)
-                sync_switch.isChecked
+                syncSwitch.isChecked
         //enable or disable data sync
         try {
-            cloudSync = sync_switch.isChecked
+            cloudSync = syncSwitch.isChecked
         }catch (e : Exception){
             //save log file with exception
             val f = File("${v.context.filesDir}/log.txt")

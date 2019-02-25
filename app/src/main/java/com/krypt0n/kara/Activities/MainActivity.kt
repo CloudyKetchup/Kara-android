@@ -21,6 +21,9 @@ import com.krypt0n.kara.UI.Fragments.EmptyListFragment
 import com.krypt0n.kara.UI.Fragments.NotesFragment
 import com.krypt0n.kara.UI.Fragments.SettingsFragment
 import com.krypt0n.kara.UI.Fragments.TrashFragment
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.account_popup.*
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File

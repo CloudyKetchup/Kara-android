@@ -47,7 +47,7 @@ object Cloud {
     }
     //upload backup to cloud
     fun upload(fileName : String,fileForUpload : String) {
-        Thread {
+         Thread {
             try{
                 if (File(fileForUpload).exists()) {
                     //connectFTP to server ftp
@@ -63,7 +63,7 @@ object Cloud {
                     }
                     disconnectFTP()
                 }
-            } catch (e: IOException) {
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
         }.start()
@@ -79,8 +79,6 @@ object Cloud {
                     retrieveFile(file,FileOutputStream(fileLocation))
                 }
             }
-        } catch (e : IOException) {
-            e.printStackTrace()
-        }
+        } catch (e : IOException) {}
     }
 }

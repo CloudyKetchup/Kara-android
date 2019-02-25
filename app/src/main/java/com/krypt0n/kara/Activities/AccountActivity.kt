@@ -76,10 +76,12 @@ class AccountActivity : AppCompatActivity() {
                             name = response
                             this.email = email
                             this.password = password
+                            createConfig()
                         }
-                        Account.createConfig()
-                        Cloud.sync("notes")
-                        Cloud.sync("trash")
+                        Cloud.apply {
+                            sync("notes","$filesDir/notes")
+                            sync("trash","$filesDir/trash")
+                        }
                         finish()
                     }
                 }

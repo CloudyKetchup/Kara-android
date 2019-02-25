@@ -12,7 +12,7 @@ var internetAvailable = false             //Device internet connection
 var ftpConnected = false
 var logedIn = false
 var cloudSync = false                     //Cloud Backup on/off
-const val ip = "192.168.0.14"             //Server ip
+const val ip = "192.168.1.135"             //Server ip
 const val ftpPort = 2221                  //FTP connection port
 const val databaseServicePort = 3000      //Server service port
 
