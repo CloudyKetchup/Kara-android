@@ -15,10 +15,12 @@ import com.krypt0n.kara.Repository.*
 import java.util.regex.Pattern
 
 class RecyclerAdapter(private val list : ArrayList<Note>) : RecyclerView.Adapter<RecyclerAdapter.CustomViewHolder>() {
+    // list item parameters
     override fun onBindViewHolder(holder : CustomViewHolder, position : Int) {
         val title = list[position].title
         var text = list[position].text
         holder.titleField.text = title
+        // pattern for cutting description length for RecyclerView item
         val pattern = Pattern.compile("(^([\\S]+)([ ])([\\S]+)([ ])([\\w\\d]+))")
         val matcher = pattern.matcher(text)
         text = if (matcher.find())
@@ -35,25 +37,35 @@ class RecyclerAdapter(private val list : ArrayList<Note>) : RecyclerView.Adapter
         val v = LayoutInflater.from(parent.context).inflate(R.layout.notes_list,parent,false)
         return CustomViewHolder(v)
     }
-    //remove note from list,will be called on swipe
+
+    /**
+     * remove note from list on swipe
+     * @param position
+     */
     fun removeItem(position: Int){
         list.removeAt(position)
         notifyItemRemoved(position)
     }
+
+    /**
+     * move to trash item on swipe
+     * @param position
+     */
     fun moveToTrash(position: Int){
         trash.add(notes[position])
         notes.removeAt(position)
         notifyItemRemoved(position)
     }
-    /*restore note on swipe to right in trash section
-    * this will run only on trash section,so can call list
-    * and don't worry that it will use notes ArrayList*/
+
+    /**
+     * restore note on swipe
+     * @param position
+     */
     fun restoreNote(position: Int){
         notes.add(trash[position])
         trash.removeAt(position)
         notifyItemRemoved(position)
     }
-    //element look in list
     class CustomViewHolder(val view : View) : RecyclerView.ViewHolder(view){
         val titleField = view.findViewById(R.id.note_title) as TextView
         val descField = view.findViewById(R.id.note_desc) as TextView
@@ -62,7 +74,7 @@ class RecyclerAdapter(private val list : ArrayList<Note>) : RecyclerView.Adapter
         init {
             updateImages()
             if (openedNotes){
-                //set ability to click and popup note activity
+                // ability to click and start note activity
                 view.setOnClickListener {
                     selected_item = adapterPosition
                     view.context.startActivity(Intent(view.context, NoteActivity()::class.java))
@@ -71,16 +83,16 @@ class RecyclerAdapter(private val list : ArrayList<Note>) : RecyclerView.Adapter
         }
         //change background view icons
         private fun updateImages(){
-            val right_icon = if (openedNotes)
+            val rightIcon = if (openedNotes)
                 R.drawable.ic_delete
             else
                 R.drawable.ic_delete_forever
-            val left_icon = if (openedNotes)
+            val leftIcon = if (openedNotes)
                 R.drawable.ic_delete_forever
             else
                 R.drawable.ic_restore
-            view.findViewById<ImageView>(R.id.swipe_left_icon).setImageResource(left_icon)
-            view.findViewById<ImageView>(R.id.swipe_right_icon).setImageResource(right_icon)
+            view.findViewById<ImageView>(R.id.swipe_left_icon).setImageResource(leftIcon)
+            view.findViewById<ImageView>(R.id.swipe_right_icon).setImageResource(rightIcon)
         }
     }
 }

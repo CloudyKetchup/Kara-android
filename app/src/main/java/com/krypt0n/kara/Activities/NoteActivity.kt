@@ -8,6 +8,7 @@ import com.krypt0n.kara.Repository.notes
 import com.krypt0n.kara.Repository.selected_item
 import com.krypt0n.kara.Repository.writeFile
 import kotlinx.android.synthetic.main.activity_note.*
+import kotlinx.android.synthetic.main.note_toolbar.*
 
 class NoteActivity : AppCompatActivity() {
     private lateinit var note : Note
@@ -15,6 +16,9 @@ class NoteActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note)
+        note_back_arrow.setOnClickListener {
+            onBackPressed()
+        }
         note = notes[selected_item]
         note_title_field.setText(note.title)
         note_text_field.setText(note.text)

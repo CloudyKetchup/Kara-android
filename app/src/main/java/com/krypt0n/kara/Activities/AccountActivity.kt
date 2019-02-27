@@ -1,6 +1,7 @@
 package com.krypt0n.kara.Activities
 
 import android.os.Bundle
+import android.support.constraint.ConstraintLayout
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Toast
@@ -18,8 +19,8 @@ import kotlinx.android.synthetic.main.registration_layout.*
 
 class AccountActivity : AppCompatActivity() {
     private val compositeDisposable = CompositeDisposable()
-    private lateinit var serverService: ServerService
-    private var loginLayoutOpened = false
+    private lateinit var serverService : ServerService
+    private var loginLayoutOpened = false   // will be used for changing login/registration view
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,11 +58,16 @@ class AccountActivity : AppCompatActivity() {
                 if (serverOnline){
                     loginProcedure(email,password)
                 }else
-                    toastMessage("Server offline,try again later")
+                    toastMessage(login_activity_layout,"Server offline,try again later")
             }
         }
     }
-    //login logic
+
+    /**
+     * login logic
+     * @param email
+     * @param password
+     */
     private fun loginProcedure(email: String, password: String) {
         compositeDisposable.add(serverService.loginUser(email, password)
             .subscribeOn(Schedulers.io())
@@ -98,14 +104,20 @@ class AccountActivity : AppCompatActivity() {
             name.isEmpty() -> registration_name_field.error = "Name cannot be empty"
             password.isEmpty() -> registration_password_field.error = "Password cannot be empty"
             else -> {
-                if (serverOnline)
+//                if (serverOnline)
                     registerProcedure(name,email,password)
-                else
-                    toastMessage("Server offline,try again later")
+//                else
+//                    toastMessage(registration_layout,"Server offline,try again later")
             }
         }
     }
-    //registration logic
+
+    /**
+     * registration logic
+     * @param name
+     * @param email
+     * @param password
+     */
     private fun registerProcedure(name : String,email : String,password: String){
         //will register account
         compositeDisposable.add(serverService.registerUser(email,name,password)
@@ -125,7 +137,7 @@ class AccountActivity : AppCompatActivity() {
         setContentView(R.layout.registration_layout)
         loginLayoutOpened = false
     }
-    private fun toastMessage(message : String){
-        Toast.makeText(login_activity_layout.context,message,Toast.LENGTH_SHORT).show()
+    private fun toastMessage(layout: ConstraintLayout, message: String){
+        Toast.makeText(layout.context,message,Toast.LENGTH_SHORT).show()
     }
 }

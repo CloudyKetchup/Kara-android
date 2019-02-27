@@ -14,13 +14,22 @@
             android:layout_marginTop="25dp"
             android:layout_marginStart="25dp"
             android:id="@+id/cloud_text"/>
-    <android.support.v7.widget.SwitchCompat
+    <Switch
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:theme="@style/Switch"
             android:layout_marginTop="25dp"
-            android:id="@+id/sync_switch"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="25dp"/>
+            android:layout_marginEnd="25dp"
+            android:id="@+id/sync_switch"/>
+    <View
+            android:layout_width="370dp"
+            android:layout_height="2dp"
+            android:background="@android:color/darker_gray"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/cloud_text"
+            android:layout_marginTop="15dp"
+            android:id="@+id/line1"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -31,12 +40,21 @@
             android:layout_marginTop="40dp"
             android:layout_marginStart="25dp"
             android:id="@+id/theme_text"/>
-    <android.support.v7.widget.SwitchCompat
+    <Switch
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:theme="@style/Switch"
             android:layout_marginTop="40dp"
             android:layout_marginEnd="25dp"
             android:layout_alignParentEnd="true"
             android:layout_below="@id/sync_switch"
             android:id="@+id/theme_switch"/>
+    <View
+            android:layout_width="370dp"
+            android:layout_height="2dp"
+            android:background="@android:color/darker_gray"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/theme_text"
+            android:layout_marginTop="15dp"
+            android:id="@+id/line2"/>
 </RelativeLayout>

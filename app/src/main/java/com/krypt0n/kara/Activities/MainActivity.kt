@@ -13,7 +13,9 @@ import android.support.multidex.MultiDex
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import com.krypt0n.kara.Cloud.Account
+import com.krypt0n.kara.Cloud.Account.config
 import com.krypt0n.kara.Cloud.Cloud
 import com.krypt0n.kara.R
 import com.krypt0n.kara.Repository.*
@@ -21,17 +23,17 @@ import com.krypt0n.kara.UI.Fragments.EmptyListFragment
 import com.krypt0n.kara.UI.Fragments.NotesFragment
 import com.krypt0n.kara.UI.Fragments.SettingsFragment
 import com.krypt0n.kara.UI.Fragments.TrashFragment
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.account_popup.*
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
+import java.io.FileReader
+import java.io.FileWriter
 import java.io.PrintStream
 import java.net.InetSocketAddress
 import java.net.Socket
 
 class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -41,23 +43,15 @@ class MainActivity : AppCompatActivity() {
             enableAnimation(false)
             onNavigationItemSelectedListener = navListener
         }
-        //will open fragment depending on notes list size
-        if (notes.isEmpty())
+        startupTasks()
+         //will open fragment depending on notes list size
+        if (notes.isEmpty()) {
+            openedNotes = true
+            //fragment with empty box if notes are empty
             openFragment(EmptyListFragment())
-        else
+        }else
+            //fragment with notes list if have at least on note
             openFragment(NotesFragment())
-        //check device connection to internet for future tasks
-        checkInternet()
-        //check if server is alive
-        if (internetAvailable)
-            checkServer()
-        filesDirectory = filesDir.toString()
-        //load notes from file to and place them in arraylist
-        loadFile("$filesDir","notes")
-        loadFile("$filesDir","trash")
-        //account initialization,also from file if exist
-        if (File("$filesDir/acc_config.json").exists())
-            loadAccount()
     }
     //multi dex
     override fun attachBaseContext(base : Context) {
@@ -79,7 +73,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStop() {
         writeFile("$filesDir/notes", notes)
         writeFile("$filesDir/trash", trash)
-        if (logedIn){
+        if (loggedIn){
             Cloud.apply {
                 upload("notes","$filesDir/notes")
                 upload("trash","$filesDir/trash")
@@ -90,16 +84,18 @@ class MainActivity : AppCompatActivity() {
     private var navListener = OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.notes -> {
-                if (notes.isEmpty())
+                if (notes.isEmpty()) {
+                    openedNotes = true
                     openFragment(EmptyListFragment())
-                else
+                }else
                     openFragment(NotesFragment())
                 return@OnNavigationItemSelectedListener true
             }
             R.id.trash -> {
-                if (trash.isEmpty())
+                if (trash.isEmpty()) {
+                    openedNotes = false
                     openFragment(EmptyListFragment())
-                else
+                }else
                     openFragment(TrashFragment())
                 return@OnNavigationItemSelectedListener true
             }
@@ -121,13 +117,36 @@ class MainActivity : AppCompatActivity() {
         }
         false
     }
-    //open fragment containing note list (notes/trash)
+
+    /**
+     * Open fragment containing note list (notes/trash)
+     * @param fragment
+     */
     private fun openFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.fragment_container,fragment)
             addToBackStack(null)
             commit()
         }
+    }
+    private fun createSettingsFile(){
+        Thread {
+            settings = JsonObject().apply {
+                addProperty("cloudSync", false)
+                addProperty("lightTheme", false)
+            }
+            writeSettingsFile()
+        }.start()
+    }
+    //load settings file
+    private fun loadSettings(){
+        Thread {
+            settings = (JsonParser().parse(FileReader("$filesDir/settings.json")) as JsonObject)
+                .apply {
+                    cloudSync = get("cloudSync").asBoolean
+                    lightTheme = get("lightTheme").asBoolean
+                }
+        }.start()
     }
     //load account data from file acc_config.json
     private fun loadAccount() {
@@ -138,14 +157,14 @@ class MainActivity : AppCompatActivity() {
             name = user.get("name").toString()
             email = user.get("email").toString()
             password = user.get("password").toString()
-            logedIn = true
+            loggedIn = true
         }
     }
     //account dialog
     private fun showPopup(){
         Dialog(this).apply {
             setContentView(R.layout.account_popup)
-            window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             account_name_field.text = Account.name
             account_email_field.text = Account.email
             close_popup.setOnClickListener {
@@ -157,9 +176,28 @@ class MainActivity : AppCompatActivity() {
             }
         }.show()
     }
+    //startupTasks tasks
+    private fun startupTasks(){
+        //check device connection to internet for future tasks
+        checkInternet()
+        //check if server is alive
+        if (internetAvailable)
+            checkServer()
+        filesDirectory = filesDir
+        //load notes from file to and place them in ArrayList
+        loadFile("$filesDir/notes")
+        loadFile("$filesDir/trash")
+        //account/settings initialization,also from file if exist
+        if (File("$filesDir/acc_config.json").exists())
+            loadAccount()
+        if (File("$filesDir/settings.json").exists())
+            loadSettings()
+        else
+            createSettingsFile()
+    }
     //check device internet connection
     private fun checkInternet(){
-        (this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).apply {
+        (getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).apply {
             if (activeNetworkInfo != null && activeNetworkInfo.isConnected)
                 internetAvailable = true
         }
@@ -169,7 +207,7 @@ class MainActivity : AppCompatActivity() {
         Thread {
             try{
                 Socket().apply {
-                    connect(InetSocketAddress(ip, databaseServicePort))
+                    connect(InetSocketAddress(ip, 12000))
                     serverOnline = true
                     close()
                 }
@@ -187,8 +225,7 @@ class MainActivity : AppCompatActivity() {
                 //files to be deleted
                 val files = arrayOf("notes", "trash", "acc_config.json")
                 for (i in files.indices) {
-//                    File("$filesDir/${files[i]}").delete()
-                    deleteFile(files[i])
+                    File("$filesDir/${files[i]}").delete()
                 }
             } catch (e: Exception) {
                 val f = File("$filesDir/log.txt")

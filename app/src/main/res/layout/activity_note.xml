@@ -7,10 +7,14 @@
                 android:background="@color/Background"
                 tools:context=".Activities.NoteActivity"
                 app:errorEnabled="true">
+    <include
+            android:id="@+id/toolbar"
+            layout="@layout/note_toolbar"/>
 
     <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/toolbar"
             android:layout_marginTop="15dp"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"

@@ -5,7 +5,9 @@ import com.krypt0n.kara.Repository.ip
 import org.apache.commons.net.ftp.FTPClient
 import java.io.*
 
-/* Cloud backup that use FTP for remote file upload and download */
+/**
+ *  Cloud backup that use FTP for remote file upload and download
+ */
 object Cloud {
     //user folder on server
     private val ftpFolder = "Documents/Kara/${Account.name}/"
@@ -25,12 +27,6 @@ object Cloud {
             disconnect()
         }
     }
-    //check if user directory exist
-    private fun userFolderExist() : Boolean{
-        if (client.changeWorkingDirectory(ftpFolder))
-            return true
-        return false
-    }
     //create user directory
     private fun createDirectory(){
         client.makeDirectory(ftpFolder)
@@ -45,9 +41,20 @@ object Cloud {
         }
         return true
     }
-    //upload backup to cloud
+    /**
+     * upload backup to cloud
+     * @param fileName
+     * @param fileForUpload
+     */
     fun upload(fileName : String,fileForUpload : String) {
-         Thread {
+        //check if user directory exist
+        fun userFolderExist() : Boolean {
+            if (client.changeWorkingDirectory(ftpFolder))
+                return true
+            return false
+        }
+        //upload thread
+        Thread {
             try{
                 if (File(fileForUpload).exists()) {
                     //connectFTP to server ftp
@@ -66,8 +73,14 @@ object Cloud {
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-        }.start()
+        }
     }
+
+    /**
+     * restore backup from cloud
+     * @param file
+     * @param fileLocation
+     */
     fun sync(file : String,fileLocation : String) {
         try {
             //check if backup exist
@@ -76,7 +89,7 @@ object Cloud {
                 client.apply {
                     changeWorkingDirectory(ftpFolder)
                     //downloading file to app folder
-                    retrieveFile(file,FileOutputStream(fileLocation))
+                    retrieveFile(file,BufferedOutputStream(FileOutputStream(fileLocation)))
                 }
             }
         } catch (e : IOException) {}

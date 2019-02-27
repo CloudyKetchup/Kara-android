@@ -9,11 +9,12 @@ import java.io.FileWriter
 
 object Account {
     lateinit var email : String
-    lateinit var name : String
+    lateinit var name  : String
     lateinit var password : String
     lateinit var config : JsonObject
     private val accountFile = File("$filesDirectory/acc_config.json")
 
+    // restore settings from file,running on startup
     fun loadConfig(){
         config = JsonParser().parse(FileReader(accountFile)) as JsonObject
     }
@@ -31,6 +32,12 @@ object Account {
             flush()
         }
     }
+
+    /**
+     * update settings file
+     * @param name
+     * @param password
+     */
     private fun updateConfig(name: String, password: String) {
         (config.get("user") as JsonObject).apply {
             addProperty("name", name)
