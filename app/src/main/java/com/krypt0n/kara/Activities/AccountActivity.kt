@@ -10,6 +10,7 @@ import com.krypt0n.kara.Cloud.Cloud
 import com.krypt0n.kara.Remote.RetrofitClient
 import com.krypt0n.kara.Remote.ServerService
 import com.krypt0n.kara.R
+import com.krypt0n.kara.Repository.loggedIn
 import com.krypt0n.kara.Repository.serverOnline
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -79,15 +80,16 @@ class AccountActivity : AppCompatActivity() {
                     "Email not exist" -> password_field.error = "Account not exist"
                     else -> {
                         Account.apply {
-                            name = response
-                            this.email = email
-                            this.password = password
+                            name = response.toString().trim()
+                            this.email = email.trim()
+                            this.password = password.trim()
                             createConfig()
                         }
                         Cloud.apply {
                             sync("notes","$filesDir/notes")
                             sync("trash","$filesDir/trash")
                         }
+                        loggedIn = true
                         finish()
                     }
                 }

@@ -3,7 +3,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/Background"
+        android:background="@color/DarkBackground"
         android:elevation="5dp"
         android:theme="@style/AppTheme.NoActionBar">
 
@@ -15,4 +15,11 @@
             android:textStyle="bold"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
             android:layout_gravity="center"/>
+    <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_sync"
+            android:onClick="sync"
+            android:layout_marginStart="15dp"
+            android:layout_gravity="start"/>
 </android.support.v7.widget.Toolbar>

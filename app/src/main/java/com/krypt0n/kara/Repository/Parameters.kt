@@ -2,6 +2,7 @@ package com.krypt0n.kara.Repository
 
 import com.google.gson.JsonObject
 import com.krypt0n.kara.Cloud.Account
+import com.krypt0n.kara.Cloud.Cloud
 import com.krypt0n.kara.Model.Note
 import java.io.*
 
@@ -16,9 +17,7 @@ var ftpConnected = false
 var loggedIn   = false
 var cloudSync  = false                     //Cloud Backup on/off
 var lightTheme = false
-const val ip = "192.168.1.135"            //Server ip
-const val ftpPort = 2221
-const val databaseServicePort = 3000
+const val ip = "192.168.0.14"            //Server ip
 
 /**
  * save notes file to local storage
@@ -28,14 +27,16 @@ const val databaseServicePort = 3000
 fun writeFile(file : String, list : ArrayList<Note>){
     Thread {
         try {
-            val oos = ObjectOutputStream(FileOutputStream(file))
+            val oos = ObjectOutputStream(FileOutputStream("$filesDirectory/$file"))
             oos.writeObject(list)
         } catch (e: Exception) {
             //save log file with exception
-            val f = File("$file/log.txt")
+            val f = File("$filesDirectory/log.txt")
             val p = PrintStream(f)
             e.printStackTrace(p)
         }
+        if (cloudSync)
+            Cloud.upload(file,"$filesDirectory/$file")
     }.start()
 }
 /**

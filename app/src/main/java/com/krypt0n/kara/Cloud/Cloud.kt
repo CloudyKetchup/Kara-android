@@ -66,7 +66,7 @@ object Cloud {
                     client.apply {
                         changeWorkingDirectory(ftpFolder)
                         //upload backup to server
-                        storeFile(fileName, BufferedInputStream(FileInputStream(fileForUpload)))
+                        storeFile(fileName, FileInputStream(fileForUpload))
                     }
                     disconnectFTP()
                 }

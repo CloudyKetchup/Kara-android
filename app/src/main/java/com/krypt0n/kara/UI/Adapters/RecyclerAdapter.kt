@@ -37,13 +37,13 @@ class RecyclerAdapter(private val list : ArrayList<Note>) : RecyclerView.Adapter
         val v = LayoutInflater.from(parent.context).inflate(R.layout.notes_list,parent,false)
         return CustomViewHolder(v)
     }
-
     /**
      * remove note from list on swipe
      * @param position
      */
     fun removeItem(position: Int){
         list.removeAt(position)
+        updateFiles()
         notifyItemRemoved(position)
     }
 
@@ -54,6 +54,7 @@ class RecyclerAdapter(private val list : ArrayList<Note>) : RecyclerView.Adapter
     fun moveToTrash(position: Int){
         trash.add(notes[position])
         notes.removeAt(position)
+        updateFiles()
         notifyItemRemoved(position)
     }
 
@@ -64,7 +65,12 @@ class RecyclerAdapter(private val list : ArrayList<Note>) : RecyclerView.Adapter
     fun restoreNote(position: Int){
         notes.add(trash[position])
         trash.removeAt(position)
+        updateFiles()
         notifyItemRemoved(position)
+    }
+    private fun updateFiles(){
+        writeFile("notes",notes)
+        writeFile("trash",trash)
     }
     class CustomViewHolder(val view : View) : RecyclerView.ViewHolder(view){
         val titleField = view.findViewById(R.id.note_title) as TextView

@@ -3,9 +3,12 @@ package com.krypt0n.kara.Activities
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import com.krypt0n.kara.Cloud.Cloud
 import com.krypt0n.kara.R
 import com.krypt0n.kara.Model.Note
+import com.krypt0n.kara.Repository.cloudSync
 import com.krypt0n.kara.Repository.notes
+import com.krypt0n.kara.Repository.writeFile
 import kotlinx.android.synthetic.main.activity_new_note.*
 import kotlinx.android.synthetic.main.note_toolbar.*
 
@@ -23,11 +26,9 @@ class NewNoteActivity : AppCompatActivity() {
         else{
             //put note object in list
             notes.add(Note(title_field.text.toString(), text_field.text.toString()))
+            writeFile("notes",notes)
             //finish this activity
             finish()
         }
-    }
-    fun exit(){
-        finish()
     }
 }

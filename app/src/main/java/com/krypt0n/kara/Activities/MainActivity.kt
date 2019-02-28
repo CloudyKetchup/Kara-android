@@ -7,15 +7,18 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
 import android.os.Bundle
+import android.support.annotation.UiThread
 import android.support.design.widget.BottomNavigationView.OnNavigationItemSelectedListener
 import android.support.design.widget.Snackbar
 import android.support.multidex.MultiDex
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
+import android.view.View
+import android.widget.Toast
+import android.widget.Toolbar
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.krypt0n.kara.Cloud.Account
-import com.krypt0n.kara.Cloud.Account.config
 import com.krypt0n.kara.Cloud.Cloud
 import com.krypt0n.kara.R
 import com.krypt0n.kara.Repository.*
@@ -27,14 +30,16 @@ import kotlinx.android.synthetic.main.account_popup.*
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.FileReader
-import java.io.FileWriter
+import java.io.IOException
 import java.io.PrintStream
+import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Socket
+import java.net.SocketAddress
 
 class MainActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
+        startupTasks()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         //bottom navigation
@@ -43,7 +48,6 @@ class MainActivity : AppCompatActivity() {
             enableAnimation(false)
             onNavigationItemSelectedListener = navListener
         }
-        startupTasks()
          //will open fragment depending on notes list size
         if (notes.isEmpty()) {
             openedNotes = true
@@ -71,14 +75,8 @@ class MainActivity : AppCompatActivity() {
     }
     //save all changes when app is closed
     override fun onStop() {
-        writeFile("$filesDir/notes", notes)
-        writeFile("$filesDir/trash", trash)
-        if (loggedIn){
-            Cloud.apply {
-                upload("notes","$filesDir/notes")
-                upload("trash","$filesDir/trash")
-            }
-        }
+        writeFile("notes", notes)
+        writeFile("trash", trash)
         super.onStop()
     }
     private var navListener = OnNavigationItemSelectedListener { item ->
@@ -117,7 +115,6 @@ class MainActivity : AppCompatActivity() {
         }
         false
     }
-
     /**
      * Open fragment containing note list (notes/trash)
      * @param fragment
@@ -130,13 +127,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun createSettingsFile(){
-        Thread {
-            settings = JsonObject().apply {
-                addProperty("cloudSync", false)
-                addProperty("lightTheme", false)
-            }
-            writeSettingsFile()
-        }.start()
+        settings = JsonObject().apply {
+            addProperty("cloudSync", false)
+            addProperty("lightTheme", false)
+        }
+        writeSettingsFile()
     }
     //load settings file
     private fun loadSettings(){
@@ -154,9 +149,9 @@ class MainActivity : AppCompatActivity() {
             loadConfig()
             //get all data required
             val user = config.get("user") as JsonObject
-            name = user.get("name").toString()
-            email = user.get("email").toString()
-            password = user.get("password").toString()
+            name = user.get("name").toString().trim('"')
+            email = user.get("email").toString().trim('"')
+            password = user.get("password").toString().trim('"')
             loggedIn = true
         }
     }
@@ -181,12 +176,12 @@ class MainActivity : AppCompatActivity() {
         //check device connection to internet for future tasks
         checkInternet()
         //check if server is alive
-        if (internetAvailable)
+//        if (internetAvailable)
             checkServer()
         filesDirectory = filesDir
         //load notes from file to and place them in ArrayList
-        loadFile("$filesDir/notes")
-        loadFile("$filesDir/trash")
+        loadFile("notes")
+        loadFile("trash")
         //account/settings initialization,also from file if exist
         if (File("$filesDir/acc_config.json").exists())
             loadAccount()
@@ -197,24 +192,41 @@ class MainActivity : AppCompatActivity() {
     }
     //check device internet connection
     private fun checkInternet(){
-        (getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).apply {
-            if (activeNetworkInfo != null && activeNetworkInfo.isConnected)
-                internetAvailable = true
-        }
+        Thread {
+            (getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).apply {
+                if (activeNetworkInfo != null && activeNetworkInfo.isConnected)
+                    internetAvailable = true
+            }
+        }.start()
     }
     //check if server is alive
     private fun checkServer(){
         Thread {
-            try{
-                Socket().apply {
-                    connect(InetSocketAddress(ip, 12000))
+            try {
+                if (InetAddress.getByName(ip).isReachable(200)){
                     serverOnline = true
-                    close()
+                    runOnUiThread {
+                        Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show()
+                    }
                 }
-            }catch (e : Exception){
+            } catch (e: IOException) {
                 serverOnline = false
+                runOnUiThread {
+                    Toast.makeText(this, "Disconnected", Toast.LENGTH_SHORT).show()
+                }
+                e.printStackTrace()
             }
         }.start()
+    }
+    //download data from cloud
+    fun sync(v : View){
+        if (loggedIn || cloudSync) {
+            Cloud.apply {
+                sync("notes", "$filesDir/notes")
+                sync("trash", "$filesDir/trash")
+            }
+        }else
+            Toast.makeText(this,"Log in first",Toast.LENGTH_SHORT).show()
     }
     //log out procedure,will delete all data
     private fun logOut(){
@@ -223,7 +235,7 @@ class MainActivity : AppCompatActivity() {
                 notes.clear()
                 trash.clear()
                 //files to be deleted
-                val files = arrayOf("notes", "trash", "acc_config.json")
+                val files = arrayOf("notes", "trash", "acc_config.json","settings.json")
                 for (i in files.indices) {
                     File("$filesDir/${files[i]}").delete()
                 }

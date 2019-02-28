@@ -34,6 +34,6 @@ class NoteActivity : AppCompatActivity() {
     private fun updateNotes() {
         note.title = note_title_field.text.toString().trim()
         note.text = note_text_field.text.toString().trim()
-        writeFile("$filesDir/notes", notes)
+        writeFile("notes", notes)
     }
 }
