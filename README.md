@@ -1,9 +1,5 @@
 # Kara-android
-android version of Kara app 
-# ScreenShot
-![Alt text](screenshots/main_screen.png?raw=true "Title"){:height="100px" width="50px"}.
-
-more in folder screenshots
+android version of Kara app
 
 # what i used
 
