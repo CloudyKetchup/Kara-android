@@ -8,8 +8,9 @@ import android.widget.Toast
 import com.krypt0n.kara.Cloud.Account
 import com.krypt0n.kara.Cloud.Cloud
 import com.krypt0n.kara.Remote.RetrofitClient
-import com.krypt0n.kara.Remote.ServerService
+import com.krypt0n.kara.Remote.ServletService
 import com.krypt0n.kara.R
+import com.krypt0n.kara.Repository.loadFile
 import com.krypt0n.kara.Repository.loggedIn
 import com.krypt0n.kara.Repository.serverOnline
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -20,7 +21,7 @@ import kotlinx.android.synthetic.main.registration_layout.*
 
 class AccountActivity : AppCompatActivity() {
     private val compositeDisposable = CompositeDisposable()
-    private lateinit var serverService : ServerService
+    private lateinit var serverService : ServletService
     private var loginLayoutOpened = false   // will be used for changing login/registration view
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,9 +29,9 @@ class AccountActivity : AppCompatActivity() {
         setContentView(R.layout.login_layout)
         loginLayoutOpened = true
 
-        //init ServerService
+        //init ServletService
         val retrofitClient = RetrofitClient.getInstance()
-        serverService = retrofitClient.create(ServerService::class.java)
+        serverService = retrofitClient.create(ServletService::class.java)
     }
     //back key adaptation for login layout and registration layout
     override fun onBackPressed() {
@@ -86,8 +87,14 @@ class AccountActivity : AppCompatActivity() {
                             createConfig()
                         }
                         Cloud.apply {
-                            sync("notes","$filesDir/notes")
-                            sync("trash","$filesDir/trash")
+                            Thread {
+                                syncFile("notes", "$filesDir/notes")
+                                loadFile("notes")
+                            }.start()
+                            Thread {
+                                syncFile("trash", "$filesDir/trash")
+                                loadFile("trash")
+                            }.start()
                         }
                         loggedIn = true
                         finish()

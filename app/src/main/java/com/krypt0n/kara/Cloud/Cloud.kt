@@ -1,7 +1,8 @@
 package com.krypt0n.kara.Cloud
 
+import com.krypt0n.kara.Repository.filesDirectory
 import com.krypt0n.kara.Repository.ftpConnected
-import com.krypt0n.kara.Repository.ip
+import org.apache.commons.net.ftp.FTP
 import org.apache.commons.net.ftp.FTPClient
 import java.io.*
 
@@ -10,26 +11,29 @@ import java.io.*
  */
 object Cloud {
     //user folder on server
-    private val ftpFolder = "Documents/Kara/${Account.name}/"
+    private val userFolder = "/Documents/Kara/${Account.email}"
     //ftp client for connecting
     private val client = FTPClient()
-
+    //connect to server FTP
     private fun connectFTP() {
         client.apply {
-            connect(ip)
+            connect("192.168.0.13",2121)
             login("krypt0n", "1708")
             enterLocalPassiveMode()
-        }
-    }
-    private fun disconnectFTP(){
-        client.apply {
-            logout()
-            disconnect()
+            //will navigate to users folder
+            changeWorkingDirectory(userFolder)
+            setFileType(FTP.BINARY_FILE_TYPE)
         }
     }
     //create user directory
     private fun createDirectory(){
-        client.makeDirectory(ftpFolder)
+        client.makeDirectory(userFolder)
+    }
+    //check if user directory exist
+    private fun userFolderExist() : Boolean {
+        if (client.changeWorkingDirectory(userFolder))
+            return true
+        return false
     }
     //check if backup file on server exist
     private fun backupExist(filePath : String) : Boolean {
@@ -42,56 +46,52 @@ object Cloud {
         return true
     }
     /**
-     * upload backup to cloud
+     * uploadFile backup to cloud
      * @param fileName
      * @param fileForUpload
      */
-    fun upload(fileName : String,fileForUpload : String) {
-        //check if user directory exist
-        fun userFolderExist() : Boolean {
-            if (client.changeWorkingDirectory(ftpFolder))
-                return true
-            return false
-        }
-        //upload thread
-        Thread {
-            try{
-                if (File(fileForUpload).exists()) {
-                    //connectFTP to server ftp
-                    connectFTP()
-                    //create user folder if missing
-                    if (!userFolderExist())
-                        createDirectory()
-                    //upload procedure
-                    client.apply {
-                        changeWorkingDirectory(ftpFolder)
-                        //upload backup to server
-                        storeFile(fileName, FileInputStream(fileForUpload))
-                    }
-                    disconnectFTP()
+    @Synchronized
+    fun uploadFile(fileName : String, fileForUpload : String) {
+        try{
+            connectFTP()
+            if (File(fileForUpload).exists()) {
+                //create user folder if missing
+                if (!userFolderExist())
+                    createDirectory()
+                //uploadFile procedure
+                client.apply {
+                    //uploadFile backup to server
+                    storeFile(fileName,BufferedInputStream(FileInputStream(fileForUpload)))
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
             }
+        } catch (e: Exception) {
+            val f = File("$filesDirectory/log.txt")
+            val p = PrintStream(f)
+            e.printStackTrace(p)
+        } finally {
+            //in any case will disconnect
+            client.disconnect()
         }
     }
-
     /**
      * restore backup from cloud
-     * @param file
+     * @param fileName
      * @param fileLocation
      */
-    fun sync(file : String,fileLocation : String) {
+    @Synchronized
+    fun syncFile(fileName : String, fileLocation : String) {
         try {
+            connectFTP()
             //check if backup exist
-            if (backupExist(ftpFolder + file)) {
-                //retrieve backup from cloud
-                client.apply {
-                    changeWorkingDirectory(ftpFolder)
-                    //downloading file to app folder
-                    retrieveFile(file,BufferedOutputStream(FileOutputStream(fileLocation)))
-                }
+            if (backupExist("$userFolder/$fileName")) {
+                //downloading file to app folder
+                client.retrieveFile(fileName,FileOutputStream(fileLocation))
             }
-        } catch (e : IOException) {}
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } finally {
+            //in any case will disconnect
+            client.disconnect()
+        }
     }
 }

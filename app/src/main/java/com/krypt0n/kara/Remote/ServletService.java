@@ -5,7 +5,7 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
 
-public interface ServerService {
+public interface ServletService {
     @POST("register")
     @FormUrlEncoded
     Observable<String> registerUser(@Field("email") String email,

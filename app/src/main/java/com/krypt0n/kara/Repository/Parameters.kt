@@ -1,7 +1,6 @@
 package com.krypt0n.kara.Repository
 
 import com.google.gson.JsonObject
-import com.krypt0n.kara.Cloud.Account
 import com.krypt0n.kara.Cloud.Cloud
 import com.krypt0n.kara.Model.Note
 import java.io.*
@@ -35,9 +34,11 @@ fun writeFile(file : String, list : ArrayList<Note>){
             val p = PrintStream(f)
             e.printStackTrace(p)
         }
-        if (cloudSync)
-            Cloud.upload(file,"$filesDirectory/$file")
     }.start()
+    if (cloudSync && internetAvailable)
+        Thread{
+            Cloud.uploadFile(file,"$filesDirectory/$file")
+        }.start()
 }
 /**
  * load file from local storage
@@ -45,13 +46,13 @@ fun writeFile(file : String, list : ArrayList<Note>){
  */
 fun loadFile(file: String) {
     Thread {
-        val f = File(file)
+        val f = File("$filesDirectory/$file")
         if (f.exists()) {
             try {
                 val temp = ObjectInputStream(FileInputStream(f)).readObject() as ArrayList<Note>
                 if (file.contains("notes")) {
                     notes = temp
-                } else
+                }else
                     trash = temp
             } catch (e: Exception) {
                 val f = File("$filesDirectory/log.txt")

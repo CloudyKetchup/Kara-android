@@ -7,7 +7,6 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
 import android.os.Bundle
-import android.support.annotation.UiThread
 import android.support.design.widget.BottomNavigationView.OnNavigationItemSelectedListener
 import android.support.design.widget.Snackbar
 import android.support.multidex.MultiDex
@@ -15,7 +14,6 @@ import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Toast
-import android.widget.Toolbar
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.krypt0n.kara.Cloud.Account
@@ -33,9 +31,6 @@ import java.io.FileReader
 import java.io.IOException
 import java.io.PrintStream
 import java.net.InetAddress
-import java.net.InetSocketAddress
-import java.net.Socket
-import java.net.SocketAddress
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,12 +67,6 @@ class MainActivity : AppCompatActivity() {
     }
     override fun onBackPressed() {
         finish()
-    }
-    //save all changes when app is closed
-    override fun onStop() {
-        writeFile("notes", notes)
-        writeFile("trash", trash)
-        super.onStop()
     }
     private var navListener = OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -121,6 +110,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun openFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction().apply {
+            //replace current fragment with chosen one
             replace(R.id.fragment_container,fragment)
             addToBackStack(null)
             commit()
@@ -136,8 +126,10 @@ class MainActivity : AppCompatActivity() {
     //load settings file
     private fun loadSettings(){
         Thread {
+            //initialize settings JsonObject and parse it from file
             settings = (JsonParser().parse(FileReader("$filesDir/settings.json")) as JsonObject)
                 .apply {
+                    //get properties
                     cloudSync = get("cloudSync").asBoolean
                     lightTheme = get("lightTheme").asBoolean
                 }
@@ -158,13 +150,18 @@ class MainActivity : AppCompatActivity() {
     //account dialog
     private fun showPopup(){
         Dialog(this).apply {
+            //set view
             setContentView(R.layout.account_popup)
+            //semitransparent background
             window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            //setup fields text
             account_name_field.text = Account.name
             account_email_field.text = Account.email
+            //close popup when click X button
             close_popup.setOnClickListener {
                 dismiss()
             }
+            //logout procedure on click
             logout_button.setOnClickListener {
                 logOut()
                 dismiss()
@@ -173,11 +170,8 @@ class MainActivity : AppCompatActivity() {
     }
     //startupTasks tasks
     private fun startupTasks(){
-        //check device connection to internet for future tasks
-        checkInternet()
         //check if server is alive
-//        if (internetAvailable)
-            checkServer()
+        checkServer()
         filesDirectory = filesDir
         //load notes from file to and place them in ArrayList
         loadFile("notes")
@@ -191,42 +185,56 @@ class MainActivity : AppCompatActivity() {
             createSettingsFile()
     }
     //check device internet connection
-    private fun checkInternet(){
-        Thread {
-            (getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).apply {
-                if (activeNetworkInfo != null && activeNetworkInfo.isConnected)
-                    internetAvailable = true
-            }
-        }.start()
+    private fun checkInternet() : Boolean {
+        (getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).apply {
+            return if (activeNetworkInfo != null && activeNetworkInfo.isConnected) {
+                internetAvailable = true
+                true
+            }else
+                false
+        }
     }
     //check if server is alive
     private fun checkServer(){
         Thread {
-            try {
-                if (InetAddress.getByName(ip).isReachable(200)){
-                    serverOnline = true
-                    runOnUiThread {
-                        Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show()
+            if (checkInternet()) {
+                try {
+                    //check if server is reachable
+                    if (InetAddress.getByName(ip).isReachable(300)) {
+                        serverOnline = true
+//                        runOnUiThread {
+//                            Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show()
+//                        }
                     }
+                } catch (e: IOException) {
+                    serverOnline = false
+//                    runOnUiThread {
+//                        Toast.makeText(this, "Disconnected", Toast.LENGTH_SHORT).show()
+//                    }
+                    e.printStackTrace()
                 }
-            } catch (e: IOException) {
-                serverOnline = false
-                runOnUiThread {
-                    Toast.makeText(this, "Disconnected", Toast.LENGTH_SHORT).show()
-                }
-                e.printStackTrace()
             }
         }.start()
     }
-    //download data from cloud
-    fun sync(v : View){
+    //download data from cloud when click on sync button
+    fun sync(v : View) {
         if (loggedIn || cloudSync) {
             Cloud.apply {
-                sync("notes", "$filesDir/notes")
-                sync("trash", "$filesDir/trash")
+                //separate threads because we can have only one FTP connection
+                Thread {
+                    syncFile("notes", "$filesDir/notes")
+                    loadFile("notes")
+                }.start()
+                Thread {
+                    syncFile("trash", "$filesDir/trash")
+                    loadFile("trash")
+                    openFragment(NotesFragment())
+                }.start()
             }
-        }else
-            Toast.makeText(this,"Log in first",Toast.LENGTH_SHORT).show()
+        }else {
+            val message = "Log in first and enable cloudSync in settings"
+            Toast.makeText(this,message,Toast.LENGTH_SHORT).show()
+        }
     }
     //log out procedure,will delete all data
     private fun logOut(){

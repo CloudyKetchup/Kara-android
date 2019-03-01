@@ -3,12 +3,15 @@ package com.krypt0n.kara.Activities
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import android.widget.Toast
 import com.krypt0n.kara.Cloud.Cloud
 import com.krypt0n.kara.R
 import com.krypt0n.kara.Model.Note
 import com.krypt0n.kara.Repository.cloudSync
+import com.krypt0n.kara.Repository.filesDirectory
 import com.krypt0n.kara.Repository.notes
 import com.krypt0n.kara.Repository.writeFile
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_new_note.*
 import kotlinx.android.synthetic.main.note_toolbar.*
 
