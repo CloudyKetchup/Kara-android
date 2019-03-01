@@ -6,11 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Switch
+import android.widget.Toast
 import com.krypt0n.kara.R
-import com.krypt0n.kara.Repository.cloudSync
-import com.krypt0n.kara.Repository.lightTheme
-import com.krypt0n.kara.Repository.settings
-import com.krypt0n.kara.Repository.writeSettingsFile
+import com.krypt0n.kara.Repository.*
 
 class SettingsFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -23,15 +21,18 @@ class SettingsFragment : Fragment() {
         if (cloudSync)
             syncSwitch.isChecked = true
         //enable/disable cloud synchronization with SwitchToggle in settings
-        syncSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
-            if(isChecked){
-                cloudSync = true
-                updateSettingsFile()
-            }else{
-                cloudSync = false
-                updateSettingsFile()
+        if (loggedIn) {
+            syncSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+                if (isChecked) {
+                    cloudSync = true
+                    updateSettingsFile()
+                } else {
+                    cloudSync = false
+                    updateSettingsFile()
+                }
             }
-        }
+        }else
+            Toast.makeText(this.context,"Log in first",Toast.LENGTH_SHORT).show()
         return view
     }
     private fun updateSettingsFile(){
