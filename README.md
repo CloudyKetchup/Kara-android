@@ -1,5 +1,7 @@
 # Kara-android
-android version of Kara app
+Android version of Kara app
+
+App for taking and storing notes in cloud 
 
 # what i used
 
