@@ -6,8 +6,8 @@ App for taking and storing notes in cloud
 # what i used
 
  - Kotlin					(main language)
- - Retorfit 				(connection with nodejs web servlet)
+ - Retorfit 				(connection with API)
  - Gson						(parsing json)
- - RxJava					(async data stream from nodejs servlet)
+ - RxJava					(async data stream from API)
  - apache.commons.net 		(FTP transfer for cloud backups)
  - BottomNavigationViewEX	(disable bottom navigation shift animation)
